@@ -35,6 +35,7 @@ Beyond the brief:
 - **Teach it another way** (`/api/reteach`) in 3 approaches × 3 languages, with a built-in fallback
 - **The agent as tool calls**: `diagnose_reasoning → update_learner_model → schedule_review → find_root_cause → pick_target_concept → generate/verify_question`, each with input, output, time and engine
 - **Teacher approval**: Approve / Edit / Reject the agent's draft, with a decision log
+- **Honest uncertainty**: each concept shows how sure the tutor is about the student (no evidence / low / medium / high), so a 30% starting guess is never presented as a fact
 - **WhatsApp report** to a parent or teacher, in the chosen language
 - **Agent decision trace**: why this question was chosen, step by step
 - **Closed loop**: a misconception is marked *Fixed ✅* after two correct, hint-free answers in a row

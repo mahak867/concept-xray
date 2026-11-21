@@ -306,3 +306,6 @@ td{padding:10px 8px;border-bottom:1px solid #f0ebe0}
 .judge .btn.ghost{color:#fff;border-color:#4a5468}.judge .btn.ghost:hover{border-color:#fff}
 .judge .btn.primary{background:#f5c542;color:var(--ink);border-color:#f5c542}
 @media (max-width:900px){.judge{grid-template-columns:1fr}.jstats b{font-size:22px}.jbtns{grid-template-columns:1fr}}
+
+.nd-conf{display:flex;gap:10px;align-items:center;margin-top:10px;border:1px dashed var(--line);border-radius:10px;padding:8px 10px;font-size:13px}
+.nd-conf b{display:block}.nd-conf .dots{display:flex;gap:3px}.nd-conf .dots i{width:8px;height:18px;border-radius:3px;background:#ece6d9}.nd-conf .dots i.on{background:var(--accent)}
