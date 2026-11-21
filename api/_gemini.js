@@ -1,5 +1,5 @@
 // Shared Gemini caller (server-side; key never reaches the browser)
-const MODELS = [process.env.GEMINI_MODEL, "gemini-flash-latest", "gemini-3.5-flash", "gemini-flash-lite-latest", "gemini-2.5-flash"].filter(Boolean);
+const MODELS = [process.env.GEMINI_MODEL, "gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-2.5-flash"].filter(Boolean);
 async function gemini(parts, schemaHint) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("no key");

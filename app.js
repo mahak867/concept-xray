@@ -36,7 +36,7 @@
     const p = $("#aiPill");
     p.className = "pill " + (live ? "live" : "local");
     p.textContent = live ? "● Gemini live" : "● Offline engine";
-    p.title = live ? "Reasoning is analysed by Gemini 2.5 Flash." : "No API key found: using the built-in rule engine (same taxonomy). Add GEMINI_API_KEY to go live.";
+    p.title = live ? "Reasoning is analysed by Gemini." : "No API key found: using the built-in rule engine (same taxonomy). Add GEMINI_API_KEY to go live.";
   });
 
   // ---------------- HOME ----------------
@@ -150,7 +150,7 @@
         ${res.fixedNow ? `<div class="xrow"><span>Closed loop</span><div><b style="color:var(--good)">✅ Fixed: ${esc(XR.MISCONCEPTIONS[res.fixedNow].label)}</b><br><span class="hint">Two correct, hint-free answers in a row on this concept since it was flagged.</span></div></div>` : ""}</div></div>`;
     }
     const rc = E.rootCause(S, q.concept);
-    return `<div class="xray" id="xray"><div class="xh"><b>Reasoning X-Ray</b><span class="chip ${diag.source === "gemini" ? "ai" : ""}" style="background:#ffffff22;color:#fff">${diag.source === "gemini" ? "Gemini 2.5 Flash" : "Offline rule engine"}</span></div><div class="xb">
+    return `<div class="xray" id="xray"><div class="xh"><b>Reasoning X-Ray</b><span class="chip ${diag.source === "gemini" ? "ai" : ""}" style="background:#ffffff22;color:#fff">${diag.source === "gemini" ? "Gemini" : "Offline rule engine"}</span></div><div class="xb">
       <div class="xrow"><span>Diagnosis</span><div><b>${esc(diag.label)}</b>${diag.misconception ? ` <span class="chip">${diag.misconception.replace(/_/g, "-")}</span>` : ""}</div></div>
       <div class="xrow"><span>Evidence</span><div>${diag.transcribed ? `<div class="hint">Read from photo: “${esc(diag.transcribed)}”</div>` : ""}<span class="evidence">${esc(diag.evidence)}</span></div></div>
       <div class="xrow"><span>Confidence</span><div>${pct(diag.confidence)}<span class="meter"><i style="width:${pct(diag.confidence)}"></i></span>${diag.fromReasoning ? "" : ` <span class="hint">· answer-only (no reasoning given)</span>`}</div></div>
