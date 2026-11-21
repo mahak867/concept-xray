@@ -4,7 +4,8 @@
 
 An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light). It reads a student's **reasoning**, typed or as a photo of their notebook, names the exact misconception, traces it back through a prerequisite graph to its root cause, and rebuilds the student's plan and the teacher's next lesson around it.
 
-**Demo video (3 min, captioned):** `demo/concept-xray-demo.mp4`. In the app, click **Start Demo** for a guided, captioned walkthrough of every feature, or **▶ Demo video**.
+**Live app:** https://concept-xray.vercel.app (Gemini on)
+**Demo video (3 min, captioned):** `demo/concept-xray-demo.mp4`. In the app, click **Start Demo** for a guided, captioned 21-step walkthrough, or **▶ Demo video**.
 
 ## Problem-statement coverage
 
@@ -18,7 +19,26 @@ An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light). It 
 | Spaced repetition | SM-2 with confidence-weighted quality (being confidently wrong resets a card hardest) and a 15-day timeline |
 | Teacher dashboard | Class heatmap, shared misconceptions, students needing attention, a suggested lesson fix, one-click remedial assignment, CSV export |
 
-Beyond the brief: a visible **agent decision trace** (why this question), **photo input** for handwritten working, Hinglish-tolerant input, and a guided demo tour.
+Beyond the brief:
+- **Agent decision trace**: why this question was chosen, step by step
+- **Closed loop**: a misconception is marked *Fixed ✅* after two correct, hint-free answers in a row
+- **Hint ladder** (nudge → trap warning → method). Each hint lowers the mastery credit, so answers are earned.
+- **Proof of Learning report**: before vs now, learning gain, misconception evidence, downloadable for the teacher
+- **AI Lab**: runs the held-out answers through live Gemini in the browser, plus a list of the guardrails
+- **Verified question generation**: a second, independent Gemini call solves each generated question, and it's discarded if the answers disagree
+- **Recall-today %** (FSRS-style retrievability) in the review plan
+- **Photo** of handwritten working, **voice** input (en-IN), Hinglish-tolerant reasoning
+
+## Ideas we built on
+We studied well-known open-source tutoring projects and implemented their ideas in our own code. No code was copied.
+
+| Project | Idea |
+|---|---|
+| CAHLR/OATutor, Li-Evan/BloomTutor | Hint ladders, mastery per skill |
+| CAHLR/pyBKT, pykt-toolkit | Bayesian Knowledge Tracing |
+| open-spaced-repetition/fsrs4anki | Recall probability |
+| Eedi "Mining Misconceptions" (Kaggle) | Answer options mapped to misconceptions |
+| Cognitive-tutor research (model tracing) | Checking the AI's output rather than trusting it |
 
 ## Architecture
 
@@ -40,7 +60,7 @@ Browser (vanilla JS, no build)               Serverless (/api, Vercel)
 | Development (rules written against it) | 40 | 100% | 86% |
 | Held-out (new phrasings, rules not tuned on it) | 20 | 100% | **28%** |
 
-The full engine scores 100% partly because each wrong option is pre-mapped to a misconception. On reasoning text alone, keyword rules don't generalise to new wording (28%). **That is why the live product uses Gemini** for reasoning, and why the rule engine is only an offline fallback. The next step is to run the same held-out set through `/api/analyze`.
+The full engine scores 100% partly because each wrong option is pre-mapped to a misconception. On reasoning text alone, keyword rules don't generalise to new wording (28%). **That is why the live product uses Gemini** for reasoning, and why the rule engine is only an offline fallback. The same held-out set can be run through live Gemini from the app's **AI Lab** page. In a spot check on the deployed site, Gemini correctly diagnosed "after passing through a bulb the current reduces" as *current is used up*, with 95% confidence and quoted evidence. That phrasing is one the rules miss.
 
 ## Run it
 

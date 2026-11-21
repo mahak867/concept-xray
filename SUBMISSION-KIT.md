@@ -3,6 +3,8 @@
 ## One-line pitch
 Marks tell a student what is wrong. Concept X-Ray reads their reasoning and tells them why, then fixes the root cause.
 
+**Live:** https://concept-xray.vercel.app · **Code:** https://github.com/mahak867/concept-xray
+
 ## Live pitch (90 seconds, then the demo)
 1. **Hook (15 s):** "Two students both answer 12 Ω. One added wrong. The other believes parallel resistors add up. Every tutor marks them identically. That's the problem."
 2. **Who (15 s):** Class 10 CBSE students preparing for boards, and a teacher with 40 notebooks and no time to read the working in each one.
@@ -18,7 +20,8 @@ Marks tell a student what is wrong. Concept X-Ray reads their reasoning and tell
 
 ## Before you submit (do these yourself)
 - [ ] Talk to 3–5 Class 10 students or juniors. Add one real quote and one number to the pitch. This is worth up to 20 points.
-- [ ] Deploy to Vercel with `GEMINI_API_KEY` and check that the pill reads "● Gemini live".
+- [x] Deployed to Vercel with Gemini live
+- [ ] Open AI Lab on the live site, click "Run the held-out check on Gemini", and put the score in the pitch next to the offline rules' 28%
 - [ ] Try the photo upload once with a real handwritten working.
 
 ## LinkedIn posts (rewrite in your own voice and tag @Product Space)
