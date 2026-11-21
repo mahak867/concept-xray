@@ -390,7 +390,7 @@
           <p class="hint" style="margin-top:10px">Keyword rules don't generalise to new wording. That's why the live product sends reasoning to Gemini, and keeps the rules only as an offline fallback.</p></div>
         <div class="panel"><h3>Gemini on the same held-out set</h3><p class="sub">Runs all 20 held-out responses through the live <code>/api/analyze</code> endpoint, text only, and scores them here in your browser.</p>
           <button class="btn primary" id="runLab" ${E.AI.live ? "" : "disabled"}>${E.AI.live ? "Run the held-out check on Gemini" : "Gemini is offline on this copy"}</button>
-          <div id="labOut" style="margin-top:12px"></div></div></div>
+          <div id="labOut" style="margin-top:12px"><div class="why" style="margin:0"><b>Last recorded run · 21 Nov 2026</b>Gemini recalled <strong style="font-size:18px">14 of 18</strong> misconceptions (<strong>78%</strong>) from text alone, vs 28% for the offline rules. Misses: “light goes faster inside glass”, “power = 1/25 D” and “the image shrinks when you walk away” (no misconception returned), and “magnification is v by u” (labelled as a sign-convention error instead of a mirror/lens mix-up). The prompt was not tuned on this set.</div></div></div></div>
       <div class="panel"><h3>Guardrails we check</h3><ul style="margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.8">
         <li>Every AI diagnosis must quote the student's own words as evidence, and shows a confidence score.</li>
         <li>Every AI-generated question is solved a second time by an independent Gemini call. It's discarded if the answers disagree.</li>

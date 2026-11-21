@@ -10,7 +10,7 @@ Marks tell a student what is wrong. Concept X-Ray reads their reasoning and tell
 2. **Who (15 s):** Class 10 CBSE students preparing for boards, and a teacher with 40 notebooks and no time to read the working in each one.
 3. **Demo (as much time as you have):** use Start Demo, or drive it yourself: answer d1 wrong with reasoning → X-Ray → concept map root cause → practice trace → teacher "assign".
 4. **Why it's real AI, not a wrapper (20 s):** Gemini reads the reasoning or notebook photo. A probabilistic learner model (BKT) and a prerequisite graph decide what comes next. SM-2 schedules reviews. Every decision is visible in the trace.
-5. **Honesty slide (10 s):** "Our offline rules recall only 28% from reasoning text alone on held-out data. That's exactly why the live product uses Gemini." Judges trust teams that measure.
+5. **Proof slide (10 s):** "On student wording our system had never seen, keyword rules caught 28% of misconceptions. Gemini caught 78%, 14 of 18. We show the four it missed too." Judges trust teams that measure.
 
 ## Likely judge questions
 - **"Isn't this just ChatGPT?"** No. The LLM does one narrow job: classifying the reasoning against our list. Mastery, selection, root cause and scheduling are deterministic models you can inspect.
@@ -21,7 +21,7 @@ Marks tell a student what is wrong. Concept X-Ray reads their reasoning and tell
 ## Before you submit (do these yourself)
 - [ ] Talk to 3–5 Class 10 students or juniors. Add one real quote and one number to the pitch. This is worth up to 20 points.
 - [x] Deployed to Vercel with Gemini live
-- [ ] Open AI Lab on the live site, click "Run the held-out check on Gemini", and put the score in the pitch next to the offline rules' 28%
+- [x] Gemini held-out check: 14/18 (78%) vs 28% for the rules
 - [ ] Try the photo upload once with a real handwritten working.
 
 ## LinkedIn posts (rewrite in your own voice and tag @Product Space)
@@ -35,7 +35,7 @@ Wish me luck. Updates through the day.
 
 **Post 2: Progress (attach a screenshot of the Reasoning X-Ray)**
 Mid-build update. A student writes "the first bulb uses up some of the current." Concept X-Ray flags *current is used up*, quotes those exact words, drops their mastery of the concept and schedules a review.
-Something I learned: my keyword rules recall only 28% of misconceptions on phrasings they weren't written for. That's exactly why the reasoning step needs an LLM, and why I measured it before claiming anything.
+Something I learned: my keyword rules caught only 28% of misconceptions on phrasings they weren't written for. Gemini caught 78% on the same unseen set. I measured both before claiming anything.
 #BuildInPublic #ProductSpace
 
 **Post 3: Shipped (attach the demo video)**

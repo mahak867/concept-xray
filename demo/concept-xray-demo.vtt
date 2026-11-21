@@ -1,85 +1,85 @@
 WEBVTT
 
 1
-00:00:01.780 --> 00:00:09.899
+00:00:01.599 --> 00:00:09.714
 Two students give the same wrong answer, for different reasons. Marks show what's wrong. Concept X-Ray shows why.
 
 2
-00:00:09.899 --> 00:00:17.344
+00:00:09.714 --> 00:00:17.157
 A generic tutor says ‘incorrect’. Concept X-Ray names the misconception, finds its root cause, and alerts the teacher.
 
 3
-00:00:17.344 --> 00:00:24.813
+00:00:17.157 --> 00:00:24.615
 It runs as a loop: diagnose, read the reasoning, update the learner model, target the next question, then schedule and report.
 
 4
-00:00:24.813 --> 00:00:33.762
+00:00:24.615 --> 00:00:33.556
 The diagnostic covers both chapters. Each answer collects the option, a line of reasoning, and the student's confidence.
 
 5
-00:00:33.762 --> 00:00:43.957
+00:00:33.556 --> 00:00:43.750
 Our student picks 0.25 amps and explains: ‘the first bulb uses up some of the current.’ They're certain.
 
 6
-00:00:43.957 --> 00:00:54.985
+00:00:43.750 --> 00:00:54.778
 The X-Ray reads the reasoning, not just the answer. It names the misconception, quotes the evidence, and gives the fix.
 
 7
-00:00:54.985 --> 00:01:03.099
+00:00:54.778 --> 00:01:02.890
 The learner model updates after every answer, using Bayesian Knowledge Tracing to separate real understanding from lucky guesses.
 
 8
-00:01:03.099 --> 00:01:11.224
+00:01:02.890 --> 00:01:11.010
 After ten questions, the X-Ray has found four distinct misconceptions, each one backed by the student's own words.
 
 9
-00:01:11.224 --> 00:01:20.750
+00:01:11.010 --> 00:01:20.537
 The concept graph shows the whole syllabus. Dashed purple rings mark root causes: weak foundations behind later mistakes.
 
 10
-00:01:20.750 --> 00:01:28.700
+00:01:20.537 --> 00:01:28.484
 Click any concept to see its mastery trend, prerequisites, active misconceptions, and next review date.
 
 11
-00:01:28.700 --> 00:01:36.810
+00:01:28.484 --> 00:01:36.594
 Practice targets the weakest concept, or its weaker prerequisite, at a difficulty matched to current mastery.
 
 12
-00:01:36.810 --> 00:01:45.258
+00:01:36.594 --> 00:01:45.041
 Every decision is shown in the trace, so teachers can check the AI's choices step by step.
 
 13
-00:01:45.258 --> 00:01:53.452
+00:01:45.041 --> 00:01:53.235
 A three-level hint ladder: nudge, trap warning, then method. Each hint lowers the mastery credit, so answers are earned.
 
 14
-00:01:53.452 --> 00:02:00.150
+00:01:53.235 --> 00:01:59.933
 Students who work on paper can photograph their notebook. Gemini Vision reads the handwriting and diagnoses it.
 
 15
-00:02:00.150 --> 00:02:08.269
+00:01:59.933 --> 00:02:08.050
 SM-2 spaced repetition builds a review plan. Confident mistakes come back first, and mastered concepts are spaced out.
 
 16
-00:02:08.269 --> 00:02:17.739
+00:02:08.050 --> 00:02:17.510
 Proof of learning: two clean answers close a misconception as Fixed. The teacher gets a before-and-after report.
 
 17
-00:02:17.739 --> 00:02:25.849
+00:02:17.510 --> 00:02:25.620
 The teacher dashboard shows class-wide gaps: 31 students by 15 concepts, with the class average on the bottom row.
 
 18
-00:02:25.849 --> 00:02:34.545
+00:02:25.620 --> 00:02:34.315
 Teachers see which wrong ideas are shared across the class, found from reasoning and not just scores.
 
 19
-00:02:34.545 --> 00:02:42.660
+00:02:34.315 --> 00:02:42.431
 One click assigns a remedial set to exactly the students who share the misconception.
 
 20
-00:02:42.660 --> 00:02:52.115
-The AI Lab measures the AI on held-out answers. This recording runs offline; the live site uses Gemini at concept-xray.vercel.app.
+00:02:42.431 --> 00:02:51.882
+On unseen wording, rules catch 28% of misconceptions and Gemini catches 78%. This recording runs offline; Gemini is live at concept-xray.vercel.app.
 
 21
-00:02:52.115 --> 00:02:58.533
+00:02:51.882 --> 00:02:58.300
 Concept X-Ray: fix the reason, not just the answer.
