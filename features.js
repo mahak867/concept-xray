@@ -221,6 +221,61 @@
     $("#fbExport").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(LS.get("cx-feedback", []), null, 2)], { type: "application/json" })); a.download = "concept-xray-feedback.json"; a.click(); };
   }, 0);
 
+  // ---------------- Explain it back (teach-back / Feynman) ----------------
+  XR.openTeachBack = function (concept) {
+    const c = XR.conceptById[concept]; closeModal();
+    const m = document.createElement("div"); m.id = "labModal";
+    m.innerHTML = `<div class="lab-box"><div class="lab-head"><div><span class="eyebrow" style="margin:0">Explain it back</span><h3>Teach ${esc(c.name)} to a confused classmate</h3></div><button class="lab-x" aria-label="Close">✕</button></div>
+      <p class="hint">If you can explain it simply, you understand it. Write 2–3 lines as if teaching a friend who missed the class. The tutor checks your explanation for wrong ideas and missing key points.</p>
+      <textarea id="tbText" style="min-height:110px" placeholder="In my own words…"></textarea>
+      <div class="lab-row"><button class="btn primary" id="tbCheck">Check my explanation</button><span class="hint" id="tbLen">0 words</span></div><div id="tbOut"></div></div>`;
+    document.body.appendChild(m); m.querySelector(".lab-x").onclick = closeModal;
+    $("#tbText").oninput = e => { $("#tbLen").textContent = e.target.value.trim().split(/\s+/).filter(Boolean).length + " words"; };
+    $("#tbCheck").onclick = async () => {
+      const text = $("#tbText").value.trim(); if (text.split(/\s+/).length < 6) { $("#tbOut").innerHTML = `<div class="lab-obs bad">Write at least one full sentence.</div>`; return; }
+      const b = $("#tbCheck"); b.disabled = true; b.innerHTML = `<span class="spinner"></span>Checking…`;
+      const q = XR.QUESTIONS.find(x => x.concept === concept);
+      let mis = null, src = "local", ms = 0, note = "";
+      if (E().AI.live) try { const [j, t] = await timed(async () => (await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: "Explain the concept: " + c.name + " — " + c.desc, options: [], chosen: "(teach-back)", correct: c.desc, reasoning: text, lang: XR.lang, taxonomy: Object.entries(XR.MISCONCEPTIONS).map(([id, mm]) => ({ id, label: mm.label })) }) })).json()); mis = XR.MISCONCEPTIONS[j.misconception_id] ? j.misconception_id : null; note = j.fix_hint || ""; src = "gemini"; ms = t; } catch {}
+      if (src === "local") mis = E().localDiagnose(q, -1, text).misconception;
+      const keys = (c.desc.toLowerCase().match(/[a-z]{5,}/g) || []).filter((w, i, a) => a.indexOf(w) === i);
+      const hit = keys.filter(k => text.toLowerCase().includes(k));
+      const pass = !mis && hit.length >= 2;
+      XR.traceAdd("grade_teach_back", `${concept}: “${text.slice(0, 50)}…”`, mis ? `misconception ${mis}` : `${hit.length} key ideas used${pass ? " · counts as evidence" : ""}`, src, ms);
+      let fixedNow = null;
+      if (pass) { fixedNow = E().record(S(), { id: "tb-" + concept, concept, diff: 2, answer: 0, mis: {} }, 0, 3, null, 0).fixedNow; E().store.save(S()); }
+      $("#tbOut").innerHTML = `<div class="lab-obs ${pass ? "ok" : "bad"}"><b>${mis ? "A wrong idea slipped in: " + esc(XR.MISCONCEPTIONS[mis].label) : pass ? (fixedNow ? "✅ Clear explanation, and a misconception is now fixed." : "Clear explanation. Counted as evidence of understanding.") : "Good start, but key ideas are missing."}</b>
+        <div style="margin-top:6px">Key ideas you used: ${hit.length ? hit.map(k => `<span class="chip">${esc(k)}</span>`).join(" ") : "none yet"}${!pass && !mis ? `<br><span class="hint">Try including: ${keys.filter(k => !hit.includes(k)).slice(0, 4).map(esc).join(", ")}</span>` : ""}</div>
+        ${note && mis ? `<div class="hint" style="margin-top:6px">${esc(note)}</div>` : ""} <span class="eng ${src}">${src === "gemini" ? "checked by Gemini" : "checked offline"}</span></div>`;
+      b.disabled = false; b.textContent = "Check again";
+      if (pass) XR.toast && XR.toast(`${c.short}: mastery ${pct(S().mastery[concept])}`);
+    };
+  };
+  document.addEventListener("click", e => { const t = e.target.closest("[data-teachback]"); if (t) XR.openTeachBack(t.dataset.teachback); });
+
+  // ---------------- class misconception trend (sample data) ----------------
+  XR.trendHTML = (top, total) => {
+    const hist = LS.get("cx-approvals", []);
+    const days = 7, W = 520, H = 170, pad = 30, colors = ["#d9534f", "#c9731b", "#0f6e6e"];
+    const series = top.slice(0, 3).map(([id, names], k) => {
+      let seed = id.split("").reduce((a, ch) => a + ch.charCodeAt(0), 0);
+      const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      const now = names.length, pts = [];
+      for (let d = 0; d < days; d++) pts.push(Math.max(1, Math.round(now * (0.75 + 0.35 * rnd() + (d / days) * 0.15))));
+      pts[days - 1] = now;
+      const approved = hist.some(h => h.mis === id && h.status === "approved");
+      if (approved) pts.push(Math.max(1, Math.round(now * 0.55)));
+      return { id, pts, approved, color: colors[k] };
+    });
+    const maxY = Math.max(...series.flatMap(s => s.pts), 1), n = days + 1;
+    const x = i => pad + (i * (W - pad * 2)) / (n - 1), y = v => H - pad + 6 - (v / maxY) * (H - pad * 1.6);
+    return `<h3>Misconception trend</h3><p class="sub">Students showing each of the top 3 misconceptions, last 7 days. <b>Sample data</b>. Approving a remedial draft adds a projected next-day point (dashed).</p>
+      <svg viewBox="0 0 ${W} ${H}" class="trend">${[0, .5, 1].map(f => `<line x1="${pad}" x2="${W - pad}" y1="${y(maxY * f)}" y2="${y(maxY * f)}" stroke="#eee"/><text x="4" y="${y(maxY * f) + 4}" font-size="10" fill="#8a90a0">${Math.round(maxY * f)}</text>`).join("")}
+      ${Array.from({ length: n }, (_, i) => `<text x="${x(i)}" y="${H - 4}" font-size="10" text-anchor="middle" fill="#8a90a0">${i < days ? (i === days - 1 ? "today" : "d-" + (days - 1 - i)) : "next"}</text>`).join("")}
+      ${series.map(s => `<polyline fill="none" stroke="${s.color}" stroke-width="2.5" points="${s.pts.slice(0, days).map((v, i) => x(i) + "," + y(v)).join(" ")}"/>${s.approved ? `<line x1="${x(days - 1)}" y1="${y(s.pts[days - 1])}" x2="${x(days)}" y2="${y(s.pts[days])}" stroke="${s.color}" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="${x(days)}" cy="${y(s.pts[days])}" r="4" fill="${s.color}"/>` : ""}<circle cx="${x(days - 1)}" cy="${y(s.pts[days - 1])}" r="4" fill="${s.color}"/>`).join("")}</svg>
+      <div class="legend">${series.map(s => `<span><i class="sw" style="background:${s.color}"></i>${esc(XR.MISCONCEPTIONS[s.id].label)}${s.approved ? " · remedial approved" : ""}</span>`).join("")}</div>`;
+  };
+
   // ---------------- WhatsApp report ----------------
   XR.whatsappText = () => {
     const st = S(), base = st.baseline || st.mastery, ids = XR.CONCEPTS.map(c => c.id);

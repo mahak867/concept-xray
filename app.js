@@ -256,7 +256,8 @@
       <p class="sub" style="margin:10px 0 4px">Unlocks</p><div class="chips">${post.map(x => `<span class="chip">${esc(XR.conceptById[x].short)}</span>`).join("") || `<span class="hint">—</span>`}</div>
       <p class="sub" style="margin:12px 0 4px">Known misconceptions tracked</p>${mis.map(([k, m]) => `<div style="font-size:13px;margin-bottom:4px">${S.misconceptions[k] ? "🔴" : "⚪"} ${esc(m.label)}</div>`).join("") || `<span class="hint">None catalogued</span>`}
       <p class="sub" style="margin:12px 0 4px">Next review</p><div style="font-size:14px">${card.due == null ? "Not yet scheduled" : card.due <= S.day ? "<b style='color:var(--weak)'>Due today</b>" : `Day ${card.due} (in ${card.due - S.day} day${card.due - S.day > 1 ? "s" : ""})`}</div>
-      <button class="btn primary" style="width:100%;margin-top:16px" id="practiceThis">Practice ${esc(c.short)} now</button>`;
+      <button class="btn accent" style="width:100%;margin-top:16px" data-teachback="${id}">🗣 Explain it back</button>
+      <button class="btn primary" style="width:100%;margin-top:8px" id="practiceThis">Practice ${esc(c.short)} now</button>`;
     $("#practiceThis").onclick = () => { ui.forceConcept = id; go("practice"); };
   }
 
@@ -351,6 +352,7 @@
     }).join("")}`;
 
     const t = topMis[0];
+    $("#trend").innerHTML = topMis.length ? XR.trendHTML(topMis, rows.length) : "";
     const ins = $("#insight"); if (t) { ins.dataset.mis = t[0]; ins.dataset.n = t[1].length; ins.innerHTML = XR.teacherDraftHTML(t[0], t[1], rows.length); } else ins.innerHTML = "";
   }
   $("#exportBtn").onclick = () => {

@@ -283,3 +283,5 @@ td{padding:10px 8px;border-bottom:1px solid #f0ebe0}
 .medal b{display:block;font-family:Fraunces,serif;font-size:20px}.medal span{display:block;font-size:13px;color:var(--good);font-weight:700}
 @keyframes medal{0%{opacity:0;transform:translate(-50%,-40%) scale(.8)}15%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
 @media (max-width:700px){.session{grid-template-columns:1fr 1fr}.sgoal{grid-column:1/-1}}
+
+.trend{width:100%;height:auto;display:block;margin:6px 0}
