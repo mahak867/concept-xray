@@ -5,7 +5,9 @@ async function gemini(parts, schemaHint) {
   if (!key) throw new Error("no key");
   let lastErr;
   for (const MODEL of MODELS) {
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+  const ac = new AbortController(); const to = setTimeout(() => ac.abort(), 9000);
+  let r;
+  try { r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, { signal: ac.signal,
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": key },
     body: JSON.stringify({
@@ -14,6 +16,7 @@ async function gemini(parts, schemaHint) {
       systemInstruction: { parts: [{ text: "You are a careful CBSE Class 10 physics teacher. Reply ONLY with JSON matching: " + schemaHint }] },
     }),
   });
+  } catch (e) { lastErr = new Error(`gemini timeout (${MODEL})`); continue; } finally { clearTimeout(to); }
   if (r.status === 404 || r.status === 429 || r.status >= 500) { lastErr = new Error(`gemini ${r.status} (${MODEL})`); continue; }
   if (!r.ok) throw new Error("gemini " + r.status);
   const j = await r.json();

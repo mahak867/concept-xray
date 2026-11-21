@@ -423,18 +423,23 @@
       for (let [qid, ch, text, gold, set] of rows) { if (gold === "null") set = "correct";
         const q = XR.questionById[qid]; n++;
         b.innerHTML = `<span class="spinner"></span>Checking ${n} of ${rows.length}…`;
-        let pred = "error";
-        try {
-          const r = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.text, options: q.options, chosen: "(hidden)", correct: q.options[q.answer], reasoning: text, taxonomy: Object.entries(XR.MISCONCEPTIONS).map(([id, m]) => ({ id, label: m.label })) }) });
-          pred = (await r.json()).misconception_id || "null";
-        } catch {}
+        let pred = "timeout";
+        for (let attempt = 0; attempt < 2 && pred === "timeout"; attempt++) {
+          const ac = new AbortController(), to = setTimeout(() => ac.abort(), 20000);
+          try {
+            const r = await fetch("/api/analyze", { signal: ac.signal, method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.text, options: q.options, chosen: "(hidden)", correct: q.options[q.answer], reasoning: text, taxonomy: Object.entries(XR.MISCONCEPTIONS).map(([id, m]) => ({ id, label: m.label })) }) });
+            const j = await r.json(); pred = j.error ? "timeout" : (j.misconception_id || "null");
+          } catch {} finally { clearTimeout(to); }
+          if (pred === "timeout" && attempt === 0) b.innerHTML = `<span class="spinner"></span>Retrying ${n} of ${rows.length}…`;
+        }
+        if (pred === "timeout") { st.timeouts = (st.timeouts || 0) + 1; }
         const ok = pred === gold; st[set][1]++; if (set === "correct" ? pred !== "null" : ok) st[set][0]++;
         out.push(`<tr><td><span class="chip">${set}</span> “${esc(text)}”</td><td>${(set === "correct" ? pred === "null" : ok) ? "✅" : "❌"} ${esc(pred)}</td></tr>`);
         $("#labOut").innerHTML = `<div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px">
           <div class="kpi"><b>${st.en[0]}/${st.en[1]}</b><span>English recall (rules: 28%)</span></div>
           <div class="kpi"><b>${st.hinglish[0]}/${st.hinglish[1]}</b><span>Hinglish recall (rules: 50%)</span></div>
           <div class="kpi"><b>${st.correct[0]}/${st.correct[1]}</b><span>false alarms on correct or slip reasoning (rules: 1/10 on v2)</span></div></div>
-          <table><tbody>${out.join("")}</tbody></table>`;
+          ${st.timeouts ? `<p class="hint">${st.timeouts} item(s) timed out after a retry and are counted as misses.</p>` : ""}<table><tbody>${out.join("")}</tbody></table>`;
       }
       b.textContent = "Run again"; b.disabled = false;
     };
