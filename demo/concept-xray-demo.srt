@@ -1,83 +1,67 @@
 1
-00:00:01,599 --> 00:00:09,714
-Two students give the same wrong answer, for different reasons. Marks show what's wrong. Concept X-Ray shows why.
+00:00:03,579 --> 00:00:17,923
+Same wrong answer, different reasons. Student A believes parallel resistors add; Student B made an arithmetic slip. Different plans.
 
 2
-00:00:09,714 --> 00:00:17,157
-A generic tutor says ‘incorrect’. Concept X-Ray names the misconception, finds its root cause, and alerts the teacher.
-
-3
-00:00:17,157 --> 00:00:24,615
-It runs as a loop: diagnose, read the reasoning, update the learner model, target the next question, then schedule and report.
-
-4
-00:00:24,615 --> 00:00:33,556
+00:00:17,923 --> 00:00:27,344
 The diagnostic covers both chapters. Each answer collects the option, a line of reasoning, and the student's confidence.
 
-5
-00:00:33,556 --> 00:00:43,750
+3
+00:00:27,344 --> 00:00:38,075
 Our student picks 0.25 amps and explains: ‘the first bulb uses up some of the current.’ They're certain.
 
-6
-00:00:43,750 --> 00:00:54,778
+4
+00:00:38,075 --> 00:00:55,419
 The X-Ray reads the reasoning, not just the answer. It names the misconception, quotes the evidence, and gives the fix.
 
-7
-00:00:54,778 --> 00:01:02,890
-The learner model updates after every answer, using Bayesian Knowledge Tracing to separate real understanding from lucky guesses.
+5
+00:00:55,419 --> 00:01:11,857
+Break the misconception: predict, run the experiment, see the prediction fail, explain. The tutor re-checks the explanation and closes the misconception.
 
-8
-00:01:02,890 --> 00:01:11,010
+6
+00:01:11,857 --> 00:01:20,922
+Teach it another way: the same Class 10 lesson as an analogy, an Indian real-life example, or step by step, in English, Hinglish or Hindi.
+
+7
+00:01:20,922 --> 00:01:29,467
 After ten questions, the X-Ray has found four distinct misconceptions, each one backed by the student's own words.
 
-9
-00:01:11,010 --> 00:01:20,537
+8
+00:01:29,467 --> 00:01:40,050
 The concept graph shows the whole syllabus. Dashed purple rings mark root causes: weak foundations behind later mistakes.
 
-10
-00:01:20,537 --> 00:01:28,484
-Click any concept to see its mastery trend, prerequisites, active misconceptions, and next review date.
-
-11
-00:01:28,484 --> 00:01:36,594
+9
+00:01:40,050 --> 00:01:48,587
 Practice targets the weakest concept, or its weaker prerequisite, at a difficulty matched to current mastery.
 
-12
-00:01:36,594 --> 00:01:45,041
-Every decision is shown in the trace, so teachers can check the AI's choices step by step.
+10
+00:01:48,587 --> 00:01:57,480
+The agent shows its work as tool calls: diagnose, update the learner model, find the root cause, pick and verify the next question, schedule review.
 
-13
-00:01:45,041 --> 00:01:53,235
+11
+00:01:57,480 --> 00:02:06,113
 A three-level hint ladder: nudge, trap warning, then method. Each hint lowers the mastery credit, so answers are earned.
 
-14
-00:01:53,235 --> 00:01:59,933
-Students who work on paper can photograph their notebook. Gemini Vision reads the handwriting and diagnoses it.
-
-15
-00:01:59,933 --> 00:02:08,050
+12
+00:02:06,113 --> 00:02:14,656
 SM-2 spaced repetition builds a review plan. Confident mistakes come back first, and mastered concepts are spaced out.
 
-16
-00:02:08,050 --> 00:02:17,510
+13
+00:02:14,656 --> 00:02:24,618
 Proof of learning: two clean answers close a misconception as Fixed. The teacher gets a before-and-after report.
 
-17
-00:02:17,510 --> 00:02:25,620
+14
+00:02:24,618 --> 00:02:35,010
 The teacher dashboard shows class-wide gaps: 31 students by 15 concepts, with the class average on the bottom row.
 
-18
-00:02:25,620 --> 00:02:34,315
-Teachers see which wrong ideas are shared across the class, found from reasoning and not just scores.
+15
+00:02:35,010 --> 00:02:43,553
+The agent drafts the remedial lesson; the teacher approves, edits or rejects it before anything is assigned.
 
-19
-00:02:34,315 --> 00:02:42,431
-One click assigns a remedial set to exactly the students who share the misconception.
-
-20
-00:02:42,431 --> 00:02:51,882
+16
+00:02:43,553 --> 00:02:53,501
 On unseen wording, rules catch 28% of misconceptions and Gemini catches 78%. This recording runs offline; Gemini is live at concept-xray.vercel.app.
 
-21
-00:02:51,882 --> 00:02:58,300
+17
+00:02:53,501 --> 00:03:00,257
 Concept X-Ray: fix the reason, not just the answer.

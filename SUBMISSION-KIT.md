@@ -13,6 +13,8 @@ Marks tell a student what is wrong. Concept X-Ray reads their reasoning and tell
 5. **Proof slide (10 s):** "On student wording our system had never seen, keyword rules caught 28% of misconceptions. Gemini caught 78%, 14 of 18. We show the four it missed too." Judges trust teams that measure.
 
 ## Likely judge questions
+- **"What stops this being a ChatGPT wrapper?"** The LLM does three narrow jobs: classify reasoning, re-teach, and write questions. We measured the first (78% vs 28% for rules on held-out wording), a second independent call verifies the third, and everything has an offline fallback. Mastery, root cause, scheduling and the experiments are deterministic and inspectable as tool calls.
+- **"Why experiments?"** Conceptual-change research (Posner et al., 1982): telling students the right answer rarely dislodges a wrong belief. A prediction they watch fail does.
 - **"Isn't this just ChatGPT?"** No. The LLM does one narrow job: classifying the reasoning against our list. Mastery, selection, root cause and scheduling are deterministic models you can inspect.
 - **"How do you know the diagnosis is right?"** It always shows the quoted evidence and a confidence score. Our labelled eval set is in `eval/`, and teachers can override.
 - **"Why Class 10 physics?"** It's high-stakes (board exams). The misconceptions are well documented, and the concepts form a clear prerequisite chain.

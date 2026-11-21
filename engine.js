@@ -97,7 +97,7 @@
       const r = await withTimeout(fetch("/api/analyze", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          question: q.text, options: q.options, chosen: q.options[chosen], correct: q.options[q.answer], reasoning, image,
+          question: q.text, options: q.options, chosen: q.options[chosen], correct: q.options[q.answer], reasoning, image, lang: XR.lang,
           taxonomy: Object.entries(XR.MISCONCEPTIONS).map(([id, m]) => ({ id, label: m.label })),
         }),
       }), 15000);
@@ -116,7 +116,7 @@
         const c = XR.conceptById[conceptId];
         const r = await withTimeout(fetch("/api/generate", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ concept: c.name, description: c.desc, difficulty: diff, misconception: misconceptionId ? XR.MISCONCEPTIONS[misconceptionId].label : null }),
+          body: JSON.stringify({ concept: c.name, description: c.desc, difficulty: diff, lang: XR.lang, misconception: misconceptionId ? XR.MISCONCEPTIONS[misconceptionId].label : null }),
         }), 15000);
         const j = await r.json();
         if (j.text && j.options?.length === 4) {

@@ -24,6 +24,7 @@
     <button data-view="lab">AI Lab</button>
   </nav>
   <div class="top-actions">
+    <select id="langSel" title="Language for AI explanations" aria-label="Language"><option value="en">English</option><option value="hinglish">Hinglish</option><option value="hi">हिंदी</option></select>
     <span id="aiPill" class="pill" title="Which reasoning engine is active">Checking AI…</span>
     <button id="videoBtn" class="btn ghost">▶ Demo video</button>
     <button id="tourBtn" class="btn primary">Start Demo</button>
@@ -51,6 +52,12 @@
           <p class="q">Reasoning: “in parallel we just add them”</p><p class="ans">Misconception <b>M-PAR-ADD</b> · 93% confidence</p>
           <p class="verdict">Root cause: Ohm's law at 34% → re-teach first, then 3 targeted parallel questions, review in 1 day.</p><p class="note">Teacher sees: 11 of 31 students share this.</p></div>
       </div>
+    </div>
+    <div class="panel pair" id="sameCard">
+      <div class="row"><div><p class="eyebrow" style="margin:0 0 4px">Try it: same answer, different reason</p><h2>Two students both answer 12 Ω for two 6 Ω resistors in parallel.</h2>
+      <p class="sub" style="margin:6px 0 0">A marks-only app gives both the same red cross. Run both through the X-Ray and see two different diagnoses and two different plans.</p></div>
+      <button class="btn primary lg" id="pairBtn">X-Ray both students →</button></div>
+      <div class="pairgrid" id="pairOut"><div class="pcol ghost"><div class="pname">Student A chose <b>12 Ω</b></div><p class="ptext">“In parallel we just add them, 6 + 6 = 12 ohm.”</p></div><div class="pcol ghost"><div class="pname">Student B chose <b>12 Ω</b></div><p class="ptext">“1/R = 1/6 + 1/6 = 2/12, so R = 12 ohm.”</p></div></div>
     </div>
     <div class="pipeline" id="pipeline">
       <div class="step"><span>1</span><h5>Diagnose</h5><p>10 questions span both chapters. Every answer asks for confidence and one line of reasoning.</p></div>
@@ -153,7 +160,9 @@
 <div id="toast"></div>
 <script src="data.js"></script>
 <script src="engine.js"></script>
+<script src="features.js"></script>
 <script src="app.js"></script>
 <script src="tour.js"></script>
+<script>(function(){var s=document.getElementById("langSel");s.value=XR.lang;s.onchange=function(){XR.lang=s.value;try{localStorage.setItem("cx-lang",JSON.stringify(s.value))}catch(e){}XR.toast&&XR.toast("AI explanations now in "+s.options[s.selectedIndex].text)}})();</script>
 </body>
 </html>

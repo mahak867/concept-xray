@@ -1,11 +1,21 @@
 # Concept X-Ray
 
-**Marks tell a student *what* is wrong. Concept X-Ray tells them *why*.**
+**Marks tell a student *what* is wrong. Concept X-Ray tells them *why*, then breaks the wrong idea with an experiment.**
 
-An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light). It reads a student's **reasoning**, typed or as a photo of their notebook, names the exact misconception, traces it back through a prerequisite graph to its root cause, and rebuilds the student's plan and the teacher's next lesson around it.
+**Live:** https://concept-xray.vercel.app (Gemini on) · **Demo video:** `demo/concept-xray-demo.mp4` (3 min, captioned) · In the app: **Start Demo** for a captioned 17-step guided tour.
 
-**Live app:** https://concept-xray.vercel.app (Gemini on)
-**Demo video (3 min, captioned):** `demo/concept-xray-demo.mp4`. In the app, click **Start Demo** for a guided, captioned 21-step walkthrough, or **▶ Demo video**.
+An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light).
+
+## Why it's different
+
+| | Marks-only apps | Generic AI tutor | **Concept X-Ray** |
+|---|---|---|---|
+| Two students give the same wrong answer | Same red cross | Same explanation | **Different diagnosis per student, from their reasoning** (try "Same answer, different reason" on Home) |
+| Fixing a wrong belief | Shows the right answer | Explains again | **Predict → Observe → Explain experiment.** The student sees their own prediction fail, and their explanation is re-diagnosed. |
+| Didn't understand the explanation | — | Repeats it | **Teach it another way**: analogy, Indian real-life example, or step by step, in English, Hinglish or हिंदी |
+| What the student knows | Score | Chat history | **Bayesian Knowledge Tracing over a 15-concept prerequisite graph with root-cause tracing** |
+| Is the AI right? | — | Unmeasured | **Measured: 78% vs 28% for rules on unseen wording.** Generated questions are verified by a second model call. |
+| Teacher | Marks sheet | — | **Agent drafts the remedial lesson; the teacher approves, edits or rejects it**, with an approval log |
 
 ## Problem-statement coverage
 
@@ -20,6 +30,12 @@ An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light). It 
 | Teacher dashboard | Class heatmap, shared misconceptions, students needing attention, a suggested lesson fix, one-click remedial assignment, CSV export |
 
 Beyond the brief:
+- **Break the Misconception lab**: 4 interactive experiments (series current, parallel resistors, wire length, lens power). The student predicts, observes, then explains, and the explanation is re-diagnosed as evidence toward *Fixed ✅*.
+- **Same answer, different reason**: a live opener on the Home page
+- **Teach it another way** (`/api/reteach`) in 3 approaches × 3 languages, with a built-in fallback
+- **The agent as tool calls**: `diagnose_reasoning → update_learner_model → schedule_review → find_root_cause → pick_target_concept → generate/verify_question`, each with input, output, time and engine
+- **Teacher approval**: Approve / Edit / Reject the agent's draft, with a decision log
+- **WhatsApp report** to a parent or teacher, in the chosen language
 - **Agent decision trace**: why this question was chosen, step by step
 - **Closed loop**: a misconception is marked *Fixed ✅* after two correct, hint-free answers in a row
 - **Hint ladder** (nudge → trap warning → method). Each hint lowers the mastery credit, so answers are earned.
