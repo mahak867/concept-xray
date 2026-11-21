@@ -10,7 +10,7 @@ Marks tell a student what is wrong. Concept X-Ray reads their reasoning and tell
 2. **Who (15 s):** Class 10 CBSE students preparing for boards, and a teacher with 40 notebooks and no time to read the working in each one.
 3. **Demo (as much time as you have):** use Start Demo, or drive it yourself: answer d1 wrong with reasoning → X-Ray → concept map root cause → practice trace → teacher "assign".
 4. **Why it's real AI, not a wrapper (20 s):** Gemini reads the reasoning or notebook photo. A probabilistic learner model (BKT) and a prerequisite graph decide what comes next. SM-2 schedules reviews. Every decision is visible in the trace.
-5. **Proof slide (10 s):** "On student wording our system had never seen, keyword rules caught 28% of misconceptions. Gemini caught 78%, 14 of 18. We show the four it missed too." Judges trust teams that measure.
+5. **Proof slide (10 s):** "On student wording our system had never seen, keyword rules caught 28% of misconceptions. Gemini caught 17 of 18, plus 10 of 10 in Hinglish, with 1 false alarm in 12 correct answers. We show the four it missed too." Judges trust teams that measure.
 
 ## Likely judge questions
 - **"What stops this being a ChatGPT wrapper?"** The LLM does three narrow jobs: classify reasoning, re-teach, and write questions. We measured the first (78% vs 28% for rules on held-out wording), a second independent call verifies the third, and everything has an offline fallback. Mastery, root cause, scheduling and the experiments are deterministic and inspectable as tool calls.

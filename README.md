@@ -14,7 +14,7 @@ An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light).
 | Fixing a wrong belief | Shows the right answer | Explains again | **Predict → Observe → Explain experiment.** The student sees their own prediction fail, and their explanation is re-diagnosed. |
 | Didn't understand the explanation | — | Repeats it | **Teach it another way**: analogy, Indian real-life example, or step by step, in English, Hinglish or हिंदी |
 | What the student knows | Score | Chat history | **Bayesian Knowledge Tracing over a 15-concept prerequisite graph with root-cause tracing** |
-| Is the AI right? | — | Unmeasured | **Measured: 78% vs 28% for rules on unseen wording.** Generated questions are verified by a second model call. |
+| Is the AI right? | — | Unmeasured | **Measured on unseen wording: Gemini 94% English / 100% Hinglish recall with 1/12 false alarms, vs 28% / 50% for rules.** Generated questions are verified by a second model call. |
 | Teacher | Marks sheet | — | **Agent drafts the remedial lesson; the teacher approves, edits or rejects it**, with an approval log |
 
 ## Problem-statement coverage
@@ -76,10 +76,13 @@ Browser (vanilla JS, no build)               Serverless (/api, Vercel)
 | Development (rules written against it) | 40 | 100% | 86% |
 | Held-out (new phrasings, rules not tuned on it) | 20 | 100% | **28%** |
 | **Gemini, same held-out set, text only** (live, 21 Nov 2026) | 18 with a misconception | — | **78% (14/18)** |
+| **Gemini, 40-item run (English held-out)** (live) | 18 | — | **94% (17/18)** |
+| **Gemini, Hinglish** (live) | 10 | — | **100% (10/10)** |
+| **Gemini, false alarms on correct or slip reasoning** (live) | 12 | — | **1/12** |
 | Held-out v2, Hinglish (offline rules) | 10 | — | 50% (5/10) |
 | Held-out v2, *correct* reasoning (offline rules): false alarms | 10 | — | 1/10 |
 
-The v2 set (`eval/heldout2.json`) can be run live through Gemini from the AI Lab page, which reports English recall, Hinglish recall and the false-alarm rate. Gemini's v2 numbers are not in this table until that run is done. `?demo=1` forces the offline engine for a guaranteed-stable demo, and the badge says "Demo mode (offline)".
+The v2 set (`eval/heldout2.json`) can be run live through Gemini from the AI Lab page, which reports English recall, Hinglish recall and the false-alarm rate. Gemini's v2 numbers above come from a live AI Lab run on the deployed site. `?demo=1` forces the offline engine for a guaranteed-stable demo, and the badge says "Demo mode (offline)".
 
 The full engine scores 100% partly because each wrong option is pre-mapped to a misconception. On reasoning text alone, keyword rules don't generalise to new wording (28%). **That is why the live product uses Gemini** for reasoning, and why the rule engine is only an offline fallback. Gemini recalls **78%** of held-out misconceptions from text alone, nearly 3× the rules. Its 4 misses: three phrasings where it returned no misconception, and one it labelled as a sign-convention error instead of a mirror/lens mix-up. We did not tune the prompt on this set. The same held-out set can be re-run through live Gemini from the app's **AI Lab** page. In a spot check on the deployed site, Gemini correctly diagnosed "after passing through a bulb the current reduces" as *current is used up*, with 95% confidence and quoted evidence. That phrasing is one the rules miss.
 

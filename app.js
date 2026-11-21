@@ -242,21 +242,36 @@
   }
   function nodeDetail(id, roots) {
     const c = XR.conceptById[id], p = S.mastery[id], h = [0.3, ...S.history[id]];
-    const pts = h.map((v, i) => `${(i / Math.max(1, h.length - 1)) * 280 + 10},${55 - v * 50}`).join(" ");
+    const W = 280, X = i => 14 + (i / Math.max(1, h.length - 1)) * (W - 20), Y = v => 62 - v * 52;
     const pre = XR.prereqsOf(id), post = XR.EDGES.filter(e => e[0] === id).map(e => e[1]);
     const mis = Object.entries(XR.MISCONCEPTIONS).filter(([, m]) => m.concept === id);
-    const card = S.cards[id];
-    $("#nodeDetail").innerHTML = `<p class="eyebrow" style="margin:0 0 4px">${c.chapter}</p><h3>${esc(c.name)}</h3>
-      <p style="font-size:14px;color:var(--ink2)">${esc(c.desc)}</p>
-      <div class="mrow"><span>Mastery</span><div class="bar"><i style="width:${pct(p)};background:${col(p)}"></i></div><b>${pct(p)}</b></div>
-      <p class="sub" style="margin:14px 0 2px">Mastery over ${h.length - 1} answer${h.length === 2 ? "" : "s"}</p>
-      <svg class="spark" viewBox="0 0 300 60"><line x1="10" x2="290" y1="${55 - 0.7 * 50}" y2="${55 - 0.7 * 50}" stroke="var(--good)" stroke-dasharray="3 4" opacity=".6"/><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5"/></svg>
-      ${roots.has(id) ? `<div class="why" style="background:#f2e9f7;color:var(--root)"><b>Root-cause gap</b>A concept that depends on this one is weak, and this prerequisite is weaker. Fix this first.</div>` : ""}
-      <p class="sub" style="margin:10px 0 4px">Needs first</p><div class="chips">${pre.map(x => `<span class="chip">${esc(XR.conceptById[x].short)} · ${pct(S.mastery[x])}</span>`).join("") || `<span class="hint">Foundation concept</span>`}</div>
-      <p class="sub" style="margin:10px 0 4px">Unlocks</p><div class="chips">${post.map(x => `<span class="chip">${esc(XR.conceptById[x].short)}</span>`).join("") || `<span class="hint">—</span>`}</div>
-      <p class="sub" style="margin:12px 0 4px">Known misconceptions tracked</p>${mis.map(([k, m]) => `<div style="font-size:13px;margin-bottom:4px">${S.misconceptions[k] ? "🔴" : "⚪"} ${esc(m.label)}</div>`).join("") || `<span class="hint">None catalogued</span>`}
-      <p class="sub" style="margin:12px 0 4px">Next review</p><div style="font-size:14px">${card.due == null ? "Not yet scheduled" : card.due <= S.day ? "<b style='color:var(--weak)'>Due today</b>" : `Day ${card.due} (in ${card.due - S.day} day${card.due - S.day > 1 ? "s" : ""})`}</div>
-      <button class="btn accent" style="width:100%;margin-top:16px" data-teachback="${id}">🗣 Explain it back</button>
+    const card = S.cards[id], rec = E.recall(card, S.day);
+    const att = S.attempts.filter(a => a.concept === id);
+    const acc = att.length ? att.filter(a => a.correct).length / att.length : null;
+    const formula = (c.desc.match(/[A-Za-zρ₁₂/]+\s*=\s*[^.;]+/) || [""])[0];
+    const status = p >= .7 ? ["Mastered", "good"] : p >= .4 ? ["Developing", "mid"] : ["Needs work", "weak"];
+    const qs = XR.QUESTIONS.filter(q => q.concept === id);
+    $("#nodeDetail").innerHTML = `<div class="nd-head"><span class="ring lg" style="--p:${Math.round(p * 100)};--c:${col(p)}"><b>${pct(p)}</b></span>
+        <div><p class="eyebrow" style="margin:0 0 2px">${c.chapter}</p><h3>${esc(c.name)}</h3><span class="tag ${status[1] === "good" ? "later" : status[1] === "mid" ? "soon" : "due"}">${status[0]}</span></div></div>
+      <p style="font-size:14px;color:var(--ink2);margin:10px 0">${esc(c.desc)}</p>
+      ${formula ? `<div class="formula">${esc(formula.trim())}</div>` : ""}
+      <div class="nd-stats">
+        <div><b>${att.length}</b><span>answers</span></div>
+        <div><b>${acc == null ? "—" : pct(acc)}</b><span>accuracy</span></div>
+        <div><b>${rec == null ? "—" : pct(rec)}</b><span>recall today</span></div>
+        <div><b>${card.interval ? card.interval + "d" : "—"}</b><span>interval</span></div></div>
+      <p class="sub" style="margin:14px 0 2px">Mastery after each answer <span class="hint">(dashed = 70% mastery line)</span></p>
+      <svg class="spark" viewBox="0 0 ${W} 72"><line x1="14" x2="${W - 6}" y1="${Y(.7)}" y2="${Y(.7)}" stroke="var(--good)" stroke-dasharray="3 4" opacity=".7"/>
+        <polyline points="${h.map((v, i) => X(i) + "," + Y(v)).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+        ${h.map((v, i) => i === 0 ? `<circle cx="${X(0)}" cy="${Y(v)}" r="3" fill="#cfc6b5"/>` : `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${att[i - 1]?.correct ? "var(--good)" : "var(--weak)"}"><title>${pct(v)}</title></circle>`).join("")}
+        <text x="14" y="71" font-size="9" fill="#8a90a0">start</text><text x="${W - 6}" y="71" font-size="9" fill="#8a90a0" text-anchor="end">now</text></svg>
+      ${att.length ? `<div class="nd-hist">${att.slice(-4).reverse().map(a => `<div><span>${a.correct ? "✓" : "✗"}</span> ${esc((XR.questionById[a.qid]?.text || (a.qid.startsWith("lab") ? "Experiment explanation" : a.qid.startsWith("tb") ? "Explain-it-back" : "Question")).slice(0, 44))}… <b style="color:${a.after >= a.before ? "var(--good)" : "var(--weak)"}">${a.after >= a.before ? "+" : ""}${Math.round((a.after - a.before) * 100)}</b></div>`).join("")}</div>` : ""}
+      ${roots.has(id) ? `<div class="why" style="background:#f2e9f7;color:var(--root);margin-top:10px"><b>Root-cause gap</b>A concept that depends on this one is weak, and this prerequisite is weaker. Fix this first.</div>` : ""}
+      <p class="sub" style="margin:14px 0 6px">Needs first</p>${pre.length ? pre.map(x => `<div class="mrow"><span>${esc(XR.conceptById[x].short)}</span><div class="bar"><i style="width:${pct(S.mastery[x])};background:${col(S.mastery[x])}"></i></div><b>${pct(S.mastery[x])}</b></div>`).join("") : `<span class="hint">Foundation concept: nothing before it.</span>`}
+      <p class="sub" style="margin:12px 0 6px">Unlocks</p>${post.length ? post.map(x => `<div class="mrow"><span>${esc(XR.conceptById[x].short)}</span><div class="bar"><i style="width:${pct(S.mastery[x])};background:${col(S.mastery[x])}"></i></div><b>${pct(S.mastery[x])}</b></div>`).join("") : `<span class="hint">Last step in this chapter's chain.</span>`}
+      <p class="sub" style="margin:12px 0 6px">Misconceptions on this concept</p>${mis.map(([k, m]) => { const st = S.misState?.[k]; return `<div class="nd-mis ${st?.status || "none"}"><b>${st?.status === "fixed" ? "✅ Fixed" : st?.status === "active" ? `🔴 Active · ${st.streak}/2` : "⚪ Not seen"}</b> ${esc(m.label)}${st?.evidence ? `<div class="hint">Evidence: ${esc(st.evidence)}</div>` : ""}${st?.status === "active" && XR.EXPERIMENTS[k] ? `<button class="btn sm accent" data-lab="${k}" style="margin-top:6px">🧪 Test this idea</button>` : ""}</div>`; }).join("") || `<span class="hint">None catalogued.</span>`}
+      <div class="nd-review"><span>📅</span><div><b>${card.due == null ? "Not scheduled yet" : card.due <= S.day ? "Review due today" : `Next review: day ${card.due}`}</b><span class="hint">${card.due == null ? "Answer a question to start its schedule." : `in ${Math.max(0, card.due - S.day)} day(s) · ease ${card.ef.toFixed(2)} · ${qs.length} questions in the bank`}</span></div></div>
+      <button class="btn accent" style="width:100%;margin-top:14px" data-teachback="${id}">🗣 Explain it back</button>
       <button class="btn primary" style="width:100%;margin-top:8px" id="practiceThis">Practice ${esc(c.short)} now</button>`;
     $("#practiceThis").onclick = () => { ui.forceConcept = id; go("practice"); };
   }
@@ -409,7 +424,7 @@
           <p class="hint" style="margin-top:10px">Keyword rules don't generalise to new wording. That's why the live product sends reasoning to Gemini, and keeps the rules only as an offline fallback.</p></div>
         <div class="panel"><h3>Gemini on the same held-out set</h3><p class="sub">Runs all 40 held-out responses (20 English, 10 Hinglish, 10 <i>correct</i> reasonings that should raise no flag) through the live <code>/api/analyze</code> endpoint, text only, and scores them here in your browser.</p>
           <button class="btn primary" id="runLab" ${E.AI.live ? "" : "disabled"}>${E.AI.live ? "Run the held-out check on Gemini" : "Gemini is offline on this copy"}</button>
-          <div id="labOut" style="margin-top:12px"><div class="why" style="margin:0"><b>Last recorded run · 21 Nov 2026</b>Gemini recalled <strong style="font-size:18px">14 of 18</strong> misconceptions (<strong>78%</strong>) from text alone, vs 28% for the offline rules. Misses: “light goes faster inside glass”, “power = 1/25 D” and “the image shrinks when you walk away” (no misconception returned), and “magnification is v by u” (labelled as a sign-convention error instead of a mirror/lens mix-up). The prompt was not tuned on this set.</div></div></div></div>
+          <div id="labOut" style="margin-top:12px"><div class="why" style="margin:0"><b>Last recorded run · 21 Nov 2026</b>Gemini (40-item run): English recall <strong style="font-size:18px">17/18</strong> (rules 28%), Hinglish <strong style="font-size:18px">10/10</strong> (rules 50%), <strong>1/12</strong> false alarms on correct or slip reasoning. An earlier 20-item run scored 14/18 English. Misses: “light goes faster inside glass”, “power = 1/25 D” and “the image shrinks when you walk away” (no misconception returned), and “magnification is v by u” (labelled as a sign-convention error instead of a mirror/lens mix-up). The prompt was not tuned on this set.</div></div></div></div>
       <div class="panel"><h3>Guardrails we check</h3><ul style="margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.8">
         <li>Every AI diagnosis must quote the student's own words as evidence, and shows a confidence score.</li>
         <li>Every AI-generated question is solved a second time by an independent Gemini call. It's discarded if the answers disagree.</li>
