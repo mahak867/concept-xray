@@ -142,6 +142,7 @@
       XR.traceAdd("update_learner_model", `${q.concept}: ${correct ? "correct" : "wrong"}, conf ${ui.conf}, hints ${ui.hints}`, `BKT ${pct(res.before)} → ${pct(res.after)}${res.fixedNow ? " · " + res.fixedNow + " FIXED" : ""}`);
       XR.traceAdd("schedule_review", `${q.concept} quality`, `next review day ${S.cards[q.concept].due} (SM-2)`);
       if (res.fixedNow) toast(`✅ Misconception fixed: ${XR.MISCONCEPTIONS[res.fixedNow].label}`);
+      if (res.before < 0.7 && res.after >= 0.7) { toast(`🏅 Concept mastered: ${XR.conceptById[q.concept].name}`); document.body.insertAdjacentHTML("beforeend", `<div class="medal" onanimationend="this.remove()">🏅<b>${esc(XR.conceptById[q.concept].name)}</b><span>mastered · ${pct(res.after)}</span></div>`); }
       $("#hintBtn") && $("#hintBtn").remove();
       $$("#opts .opt").forEach((b, i) => { if (i === q.answer) b.classList.add("right"); else if (i === ui.sel) b.classList.add("wrong");
         const why = i === q.answer ? "✓ Correct" : q.mis?.[i] ? "Trap: " + XR.MISCONCEPTIONS[q.mis[i]].label.toLowerCase() : "Calculation slip";
@@ -279,7 +280,13 @@
     XR.traceAdd("find_root_cause", `weakest: ${weakest.short} ${pct(S.mastery[weakest.id])}`, pick.reason.type === "root" ? pick.reason.text : "no weaker prerequisite");
     XR.traceAdd("pick_target_concept", `mastery ${pct(S.mastery[pick.target])}`, `${XR.conceptById[pick.target].short} · ${DIFF[pick.diff]} (aim ≈70% success)${lastMis ? " · targets " + lastMis : ""}`);
     XR.traceAdd(q.generated ? "generate_question + verify_question" : "select_question", `${pick.target} · ${DIFF[pick.diff]}`, q.generated ? "Gemini question, verified by a 2nd independent solve" : `calibrated bank #${q.id}`, q.generated ? "gemini" : "local");
-    $("#practicePanel").innerHTML = questionCard(q, { mode: "practice", reason: pick.reason.text });
+    const today = S.attempts.filter(x => x.day === S.day && !XR.questionById[x.qid]?.diag);
+    const goal = 10, fixedToday = Object.values(S.misState || {}).filter(m => m.status === "fixed" && m.fixedDay === S.day).length;
+    const strip = `<div class="session"><div class="sgoal"><b>${today.length}/${goal}</b><span>today's goal</span><div class="bar"><i style="width:${Math.min(100, today.length / goal * 100)}%;background:var(--accent)"></i></div></div>
+      <div><b>${today.length ? Math.round(today.filter(x => x.correct).length / today.length * 100) + "%" : "—"}</b><span>accuracy</span></div>
+      <div><b>${fixedToday}</b><span>misconceptions fixed</span></div><div><b>🔥 ${S.streak}</b><span>streak</span></div>
+      <div><b>${XR.CONCEPTS.filter(c => S.mastery[c.id] >= .7).length}/15</b><span>concepts mastered</span></div></div>`;
+    $("#practicePanel").innerHTML = strip + questionCard(q, { mode: "practice", reason: pick.reason.text });
     sidePractice();
     wireQuestion(q, () => {
       ui.recent = [...ui.recent.slice(-6), q.id];
