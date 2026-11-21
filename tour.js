@@ -58,7 +58,7 @@
     { view: "diagnostic", target: ".lab-box", feat: "Break the misconception", title: "Predict → Observe → Explain",
       body: "Telling a student the right answer rarely changes a wrong belief. Seeing their own prediction fail does. The student predicts 0.25 A, runs the circuit, sees all three ammeters read 0.50 A, then explains what changed.",
       how: "The explanation is re-diagnosed. If the misconception is gone, it counts as clean evidence toward closing it.",
-      before: async () => { XR.openLab("M_CUR_USED", { closeLoop: true }); await wait(400); await typeInto("#labPred", "0.25", 60); click("#labGo"); await wait(2500); await typeInto("#labWhy", "The current is the same everywhere in a series loop. Bulbs use energy, not current.", 22); click("#labCheck"); await wait(1500); },
+      before: async () => { XR.openLab("M_CUR_USED", { closeLoop: true }); await wait(400); document.querySelector("#labPred").value = "0.25"; await wait(700); click("#labGo"); await wait(2500); await typeInto("#labWhy", "The current is the same everywhere in a series loop. Bulbs use energy, not current.", 22); click("#labCheck"); await wait(1500); },
       cap: "Break the misconception: predict, run the experiment, see the prediction fail, explain. The tutor re-checks the explanation and closes the misconception.", ms: 17000 },
     { view: "diagnostic", target: "#xray .xact", feat: "Teach it another way", title: "Same lesson, a different approach",
       body: "If the first explanation didn't land, the student can ask for the same concept again as an analogy, a real-life Indian example, or step by step, in English, Hinglish or Hindi.",

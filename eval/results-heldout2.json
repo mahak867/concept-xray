@@ -1,0 +1,15 @@
+{
+  "n": 20,
+  "accuracy": 0.95,
+  "precision": 0.9090909090909091,
+  "recall": 1,
+  "reasoning_only_recall": 0.5,
+  "misses": [
+    {
+      "qid": "d5",
+      "text": "kWh is power multiplied by time so it is energy",
+      "gold": "null",
+      "pred": "M_KWH_POW"
+    }
+  ]
+}

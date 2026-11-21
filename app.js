@@ -36,7 +36,7 @@
   E.checkAI().then(live => {
     const p = $("#aiPill");
     p.className = "pill " + (live ? "live" : "local");
-    p.textContent = live ? "● Gemini live" : "● Offline engine";
+    p.textContent = live ? "● Gemini live" : E.AI.demo ? "● Demo mode (offline)" : "● Offline engine";
     p.title = live ? "Reasoning is analysed by Gemini." : "No API key found: using the built-in rule engine (same taxonomy). Add GEMINI_API_KEY to go live.";
   });
 
@@ -387,9 +387,11 @@
         <div class="panel"><h3>Offline rule engine (always available)</h3><p class="sub">Scored on hand-labelled student reasoning. “Text only” hides the chosen option, so only the written reasoning counts.</p>
           <table><thead><tr><th>Set</th><th>n</th><th>Full engine</th><th>Text only</th></tr></thead><tbody>
           <tr><td>Development (rules written on it)</td><td>${OFFLINE.dev.n}</td><td>${pct(OFFLINE.dev.full)}</td><td>${pct(OFFLINE.dev.text)}</td></tr>
-          <tr><td><b>Held-out (never tuned on)</b></td><td>${OFFLINE.held.n}</td><td>${pct(OFFLINE.held.full)}</td><td><b style="color:var(--weak)">${pct(OFFLINE.held.text)}</b></td></tr></tbody></table>
+          <tr><td><b>Held-out (never tuned on)</b></td><td>${OFFLINE.held.n}</td><td>${pct(OFFLINE.held.full)}</td><td><b style="color:var(--weak)">${pct(OFFLINE.held.text)}</b></td></tr>
+          <tr><td>Held-out v2: Hinglish</td><td>10</td><td>—</td><td><b style="color:var(--weak)">50%</b></td></tr>
+          <tr><td>Held-out v2: <i>correct</i> reasoning (false alarms)</td><td>10</td><td>—</td><td>1 false alarm</td></tr></tbody></table>
           <p class="hint" style="margin-top:10px">Keyword rules don't generalise to new wording. That's why the live product sends reasoning to Gemini, and keeps the rules only as an offline fallback.</p></div>
-        <div class="panel"><h3>Gemini on the same held-out set</h3><p class="sub">Runs all 20 held-out responses through the live <code>/api/analyze</code> endpoint, text only, and scores them here in your browser.</p>
+        <div class="panel"><h3>Gemini on the same held-out set</h3><p class="sub">Runs all 40 held-out responses (20 English, 10 Hinglish, 10 <i>correct</i> reasonings that should raise no flag) through the live <code>/api/analyze</code> endpoint, text only, and scores them here in your browser.</p>
           <button class="btn primary" id="runLab" ${E.AI.live ? "" : "disabled"}>${E.AI.live ? "Run the held-out check on Gemini" : "Gemini is offline on this copy"}</button>
           <div id="labOut" style="margin-top:12px"><div class="why" style="margin:0"><b>Last recorded run · 21 Nov 2026</b>Gemini recalled <strong style="font-size:18px">14 of 18</strong> misconceptions (<strong>78%</strong>) from text alone, vs 28% for the offline rules. Misses: “light goes faster inside glass”, “power = 1/25 D” and “the image shrinks when you walk away” (no misconception returned), and “magnification is v by u” (labelled as a sign-convention error instead of a mirror/lens mix-up). The prompt was not tuned on this set.</div></div></div></div>
       <div class="panel"><h3>Guardrails we check</h3><ul style="margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.8">
@@ -399,20 +401,24 @@
         <li>If Gemini fails or times out, the offline engine answers instead, so a student is never left waiting.</li></ul></div>`;
     const b = $("#runLab"); if (!b) return;
     b.onclick = async () => {
-      b.disabled = true; const rows = await (await fetch("eval/heldout.json")).json();
-      let hit = 0, n = 0, out = [];
-      for (const [qid, ch, text, gold] of rows) {
-        if (gold === "null") continue;
+      b.disabled = true;
+      const rows = [...(await (await fetch("eval/heldout.json")).json()).map(r => [...r, "en"]), ...(await (await fetch("eval/heldout2.json")).json()).map((r, k) => [...r, k < 10 ? "hinglish" : "correct"])];
+      const st = { en: [0, 0], hinglish: [0, 0], correct: [0, 0] }, out = []; let n = 0;
+      for (let [qid, ch, text, gold, set] of rows) { if (gold === "null") set = "correct";
         const q = XR.questionById[qid]; n++;
-        b.innerHTML = `<span class="spinner"></span>Checking ${n}…`;
+        b.innerHTML = `<span class="spinner"></span>Checking ${n} of ${rows.length}…`;
         let pred = "error";
         try {
           const r = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.text, options: q.options, chosen: "(hidden)", correct: q.options[q.answer], reasoning: text, taxonomy: Object.entries(XR.MISCONCEPTIONS).map(([id, m]) => ({ id, label: m.label })) }) });
           pred = (await r.json()).misconception_id || "null";
         } catch {}
-        if (pred === gold) hit++;
-        out.push(`<tr><td>“${esc(text)}”</td><td>${pred === gold ? "✅" : "❌"} ${esc(pred)}</td></tr>`);
-        $("#labOut").innerHTML = `<p><b style="font-size:22px">${hit}/${n}</b> recalled from text alone (offline rules: ${pct(OFFLINE.held.text)})</p><table><tbody>${out.join("")}</tbody></table>`;
+        const ok = pred === gold; st[set][1]++; if (set === "correct" ? pred !== "null" : ok) st[set][0]++;
+        out.push(`<tr><td><span class="chip">${set}</span> “${esc(text)}”</td><td>${(set === "correct" ? pred === "null" : ok) ? "✅" : "❌"} ${esc(pred)}</td></tr>`);
+        $("#labOut").innerHTML = `<div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:10px">
+          <div class="kpi"><b>${st.en[0]}/${st.en[1]}</b><span>English recall (rules: 28%)</span></div>
+          <div class="kpi"><b>${st.hinglish[0]}/${st.hinglish[1]}</b><span>Hinglish recall (rules: 50%)</span></div>
+          <div class="kpi"><b>${st.correct[0]}/${st.correct[1]}</b><span>false alarms on correct or slip reasoning (rules: 1/10 on v2)</span></div></div>
+          <table><tbody>${out.join("")}</tbody></table>`;
       }
       b.textContent = "Run again"; b.disabled = false;
     };

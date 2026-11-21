@@ -83,6 +83,7 @@
   const AI = { live: false, checked: false };
   async function withTimeout(p, ms) { return Promise.race([p, new Promise((_, r) => setTimeout(() => r(new Error("timeout")), ms))]); }
   async function checkAI() {
+    if (/[?&]demo=1/.test(location.search)) { AI.live = false; AI.demo = true; AI.checked = true; return false; }
     try {
       const r = await withTimeout(fetch("/api/health"), 3000);
       const j = await r.json(); AI.live = !!j.ai;

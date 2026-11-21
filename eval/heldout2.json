@@ -1,0 +1,22 @@
+[
+ ["d1",0,"pehla bulb current kha jaata hai isliye kam bachta hai","M_CUR_USED"],
+ ["d3",0,"parallel mein resistance jod do, 6 plus 6 barabar 12","M_PAR_ADD"],
+ ["d2",1,"V ko I se divide karo, R = I/V wala formula","M_OHM_INV"],
+ ["d4",0,"lamba wire matlab electron ko zyada jagah, resistance kam","M_LEN_INV"],
+ ["d6",1,"current double toh heat bhi double hogi","M_HEAT_LIN"],
+ ["d10",0,"series mein har resistor pe same voltage aata hai","M_SER_V"],
+ ["d7",0,"glass mein light normal se door mudti hai","M_REF_AWAY"],
+ ["d8",0,"focal length 25 hai toh power 1/25 = 0.04","M_POW_CM"],
+ ["d9",0,"sign convention ki zarurat nahi, sab positive le lo","M_SIGN"],
+ ["p17",0,"mirror se door jao toh image chhoti ho jaati hai","M_MIR_SIZE"],
+ ["d1",1,"in series the same current flows through both bulbs","null"],
+ ["d2",2,"I = V/R = 6/3 = 2 A","null"],
+ ["d3",1,"1/R = 1/6 + 1/6 = 1/3 so R = 3 ohm","null"],
+ ["d4",2,"R is proportional to length so doubling L doubles R","null"],
+ ["d6",2,"H = I squared R t so 2 squared = 4 times","null"],
+ ["d7",1,"glass is optically denser so light slows and bends towards the normal","null"],
+ ["d8",1,"f = 0.25 m so P = 1/0.25 = 4 D","null"],
+ ["d10",2,"I = 12/6 = 2 A, voltage across 4 ohm = 8 V","null"],
+ ["d5",1,"kWh is power multiplied by time so it is energy","null"],
+ ["d9",1,"u = -30, f = -15, 1/v = 1/f - 1/u gives v = -30","null"]
+]
