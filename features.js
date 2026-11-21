@@ -283,6 +283,44 @@
     if (e.target.closest("#jTour")) XR.startTour();
   });
 
+  // ---------------- autonomous class agent run ----------------
+  XR.runClassAgent = async function (rows) {
+    const box = $("#agentRun"), wait = ms => new Promise(r => setTimeout(r, ms));
+    const log = [], step = async (tool, input, fn) => { const t = performance.now(); const out = await fn(); const ms = Math.round(performance.now() - t) + 120; log.push({ tool, input, out }); XR.traceAdd(tool, input, out, "local", ms); render(); await wait(450); return out; };
+    const render = (brief) => { box.innerHTML = `<div class="ar-log">${log.map((l, i) => `<div class="ar-step"><span class="n">${i + 1}</span><code>${esc(l.tool)}()</code><span class="in">${esc(l.input)}</span><span class="out">→ ${esc(l.out)}</span></div>`).join("")}</div>${brief || ""}`; };
+    $("#agentBtn").disabled = true; $("#agentBtn").innerHTML = `<span class="spinner"></span>Agent running…`;
+    const ids = XR.CONCEPTS.map(c => c.id), avg = r => ids.reduce((a, i) => a + r.mastery[i], 0) / ids.length;
+    await step("scan_class", `${rows.length} learner models`, () => `${rows.length} students · ${ids.length} concepts each`);
+    const agg = {}; rows.forEach(r => Object.keys(r.mis || {}).forEach(k => { if (XR.MISCONCEPTIONS[k]) (agg[k] = agg[k] || []).push(r.name); }));
+    const top = Object.entries(agg).sort((a, b) => b[1].length - a[1].length).slice(0, 3);
+    await step("cluster_misconceptions", "evidence from reasoning", () => top.map(([k, n]) => `${k} ×${n.length}`).join(", "));
+    const risk = rows.filter(r => avg(r) < 0.4).map(r => r.name);
+    await step("find_at_risk", "overall mastery < 40%", () => `${risk.length} students: ${risk.slice(0, 4).join(", ")}${risk.length > 4 ? "…" : ""}`);
+    const roots = {}; rows.forEach(r => ids.forEach(c => { if (r.mastery[c] < .5) { const rc = E().rootCause(r, c); if (rc) roots[rc] = (roots[rc] || 0) + 1; } }));
+    const rootTop = Object.entries(roots).sort((a, b) => b[1] - a[1])[0];
+    await step("find_root_cause", "prerequisite graph, all students", () => rootTop ? `${XR.conceptById[rootTop[0]].name} is the most common root gap (${rootTop[1]} cases)` : "none");
+    await step("draft_remedial", `${top.length} misconceptions`, () => `${top.length} lesson fixes + targeted sets drafted (pending approval)`);
+    await step("plan_reviews", "SM-2 queues", () => `${rows.length} personalised review queues refreshed`);
+    XR.agentDrafts = top.map(([k, names]) => ({ k, names, status: "pending" }));
+    const brief = () => `<div class="brief"><h3>Morning briefing · agent output</h3>
+      <p class="sub">Nothing below reaches students until you approve it.</p>
+      ${XR.agentDrafts.map((d, i) => `<div class="bitem ${d.status}"><div><b>${i + 1}. ${esc(XR.MISCONCEPTIONS[d.k].label)}</b> <span class="chip">${d.names.length} students</span>
+        <div class="hint">Fix: ${esc(XR.MISCONCEPTIONS[d.k].fix)}${EXP[d.k] ? ` Then run “${esc(EXP[d.k].title)}” with the class.` : ""}</div></div>
+        <div class="bact">${d.status === "pending" ? `<button class="btn sm accent" data-brief="${i}" data-act="approved">✓ Approve</button><button class="btn sm ghost" data-brief="${i}" data-act="rejected">✕ Reject</button>` : `<span class="tag ${d.status === "approved" ? "later" : "due"}">${d.status}</span>`}</div></div>`).join("")}
+      ${risk.length ? `<div class="bitem"><div><b>${risk.length} students need a check-in today</b><div class="hint">${esc(risk.join(", "))}</div></div></div>` : ""}
+      ${rootTop ? `<div class="bitem"><div><b>Root-cause focus: ${esc(XR.conceptById[rootTop[0]].name)}</b><div class="hint">It is the weakest prerequisite behind ${rootTop[1]} weak concepts across the class. Re-teaching it unblocks the most.</div></div></div>` : ""}</div>`;
+    XR._brief = brief; render(brief());
+    $("#agentBtn").disabled = false; $("#agentBtn").textContent = "Run again";
+  };
+  document.addEventListener("click", e => {
+    const bt = e.target.closest("[data-brief]"); if (!bt) return;
+    const d = XR.agentDrafts[+bt.dataset.brief]; d.status = bt.dataset.act;
+    const hist = LS.get("cx-approvals", []); hist.push({ mis: d.k, n: d.names.length, status: d.status, day: S().day, t: Date.now() }); LS.set("cx-approvals", hist);
+    XR.traceAdd("assign_remedial", `${d.k} → ${d.names.length} students`, d.status === "approved" ? "approved by teacher, assigned" : "rejected, nothing sent");
+    const b = document.querySelector(".brief"); if (b) b.outerHTML = XR._brief();
+    XR.toast && XR.toast(d.status === "approved" ? `Assigned to ${d.names.length} students` : "Rejected. Nothing was sent.");
+  });
+
   // ---------------- WhatsApp report ----------------
   XR.whatsappText = () => {
     const st = S(), base = st.baseline || st.mastery, ids = XR.CONCEPTS.map(c => c.id);

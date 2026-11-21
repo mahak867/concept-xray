@@ -21,6 +21,8 @@
   function go(view) {
     ui.view = view;
     $$(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+    const at = document.querySelector(`.tabs button[data-view="${view}"]`), strip = document.querySelector(".tabs");
+    if (at && strip) strip.scrollLeft = at.offsetLeft - strip.clientWidth / 2 + at.clientWidth / 2;
     $$(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + view));
     render(view); window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   }
@@ -371,6 +373,7 @@
 
     const t = topMis[0];
     $("#trend").innerHTML = topMis.length ? XR.trendHTML(topMis, rows.length) : "";
+    $("#agentBtn").onclick = () => XR.runClassAgent(rows);
     const ins = $("#insight"); if (t) { ins.dataset.mis = t[0]; ins.dataset.n = t[1].length; ins.innerHTML = XR.teacherDraftHTML(t[0], t[1], rows.length); } else ins.innerHTML = "";
   }
   $("#exportBtn").onclick = () => {

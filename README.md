@@ -18,6 +18,7 @@ An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light).
 - **It acts on a model of the student, not on the last message.** It keeps BKT mastery for 15 concepts, misconception states, and SM-2 schedules.
 - **It plans.** It traces a weak concept to its root-cause prerequisite, then picks the concept, difficulty and question.
 - **It checks itself.** Each diagnosis quotes evidence; generated questions are re-solved by an independent call; accuracy is measured on held-out data.
+- **It runs on its own.** One click runs the class agent: scan every learner model → cluster misconceptions → find at-risk students → find the most common root gap → draft fixes → refresh review queues → write a morning briefing.
 - **A human approves anything that affects a class.** The teacher approves, edits or rejects every remedial draft, and decisions are logged.
 - **It works without the AI.** Every AI call has a deterministic offline fallback, and `?demo=1` forces it.
 
@@ -103,10 +104,12 @@ The v2 set (`eval/heldout2.json`) can be run live through Gemini from the AI Lab
 The full engine scores 100% partly because each wrong option is pre-mapped to a misconception. On reasoning text alone, keyword rules don't generalise to new wording (28%). **That is why the live product uses Gemini** for reasoning, and why the rule engine is only an offline fallback. Gemini recalls **78%** of held-out misconceptions from text alone, nearly 3× the rules. Its 4 misses: three phrasings where it returned no misconception, and one it labelled as a sign-convention error instead of a mirror/lens mix-up. We did not tune the prompt on this set. The same held-out set can be re-run through live Gemini from the app's **AI Lab** page. In a spot check on the deployed site, Gemini correctly diagnosed "after passing through a bulb the current reduces" as *current is used up*, with 95% confidence and quoted evidence. That phrasing is one the rules miss.
 
 ## Tests
-Run the engine tests (23 checks on BKT, SM-2, recall, the misconception engine, the lifecycle, hint credit and data integrity):
+Engine unit tests (23 checks on BKT, SM-2, recall, the misconception engine, the lifecycle, hint credit and data integrity) and a 32-check end-to-end browser test of every flow at desktop and phone width:
 
 ```bash
 npm test
+npm run dev &  # then:
+node tests/e2e.js
 ```
 
 ## Run it
