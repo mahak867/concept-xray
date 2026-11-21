@@ -212,6 +212,15 @@
     XR.render("teacher");
   });
 
+  // ---------------- real feedback collection (no invented data) ----------------
+  document.addEventListener("DOMContentLoaded", () => {});
+  setTimeout(() => {
+    const n = () => { const el = $("#fbN"); if (el) el.textContent = LS.get("cx-feedback", []).length; }; n();
+    const send = $("#fbSend"); if (!send) return;
+    send.onclick = () => { const e = { role: $("#fbRole").value, q1: $("#fbQ1").value.trim(), q2: $("#fbQ2").value.trim(), q3: $("#fbQ3").value.trim(), t: new Date().toISOString() }; if (!e.q1 && !e.q2 && !e.q3) return; const all = LS.get("cx-feedback", []); all.push(e); LS.set("cx-feedback", all); ["#fbQ1", "#fbQ2", "#fbQ3"].forEach(s => $(s).value = ""); n(); XR.toast && XR.toast("Thanks! Feedback saved."); };
+    $("#fbExport").onclick = () => { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(LS.get("cx-feedback", []), null, 2)], { type: "application/json" })); a.download = "concept-xray-feedback.json"; a.click(); };
+  }, 0);
+
   // ---------------- WhatsApp report ----------------
   XR.whatsappText = () => {
     const st = S(), base = st.baseline || st.mastery, ids = XR.CONCEPTS.map(c => c.id);

@@ -48,3 +48,8 @@ Shipped: Concept X-Ray 🎯
 My key takeaway: the AI matters most where it's narrowest. One sharp job, with evidence shown.
 What's one physics misconception you had in school? 👇 (Replies boost reach. Answer every comment.)
 #AIHackathon #ProductSpace #EdTech
+
+## 15-minute user-evidence sprint (tonight)
+1. Send 5 Class 10 students and 1 teacher the live link. Ask them to try "Same answer, different reason", then fill the feedback box at the bottom of Home.
+2. Or ask on WhatsApp: (a) What do you do when you get a physics question wrong? (b) Which Electricity/Light topic confuses you most? (c) Would you use this? What's missing?
+3. If they used the box on your device, click **Export all**. Otherwise collect the WhatsApp replies. Paste them to Claude, and only real quotes and counts go into the README and the Home page.

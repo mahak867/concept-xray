@@ -69,6 +69,11 @@
         <span class="hint">${XR.conceptById[q.concept].chapter}</span>
       </div>
       ${reason ? `<div class="why" id="whyBox"><b>Why this question</b>${esc(reason)}</div>` : ""}
+      ${(() => { const c = XR.conceptById[q.concept], pre = XR.prereqsOf(q.concept), traps = Object.entries(XR.MISCONCEPTIONS).filter(([, m]) => m.concept === q.concept), p = S.mastery[q.concept];
+        return `<details class="primer"><summary><span class="ring" style="--p:${Math.round(p * 100)};--c:${col(p)}"><b>${pct(p)}</b></span><span><b>${esc(c.name)}</b><small>Concept primer · tap to open</small></span></summary>
+        <div class="primer-body"><div><h6>Key idea</h6><p>${esc(c.desc)}</p></div>
+        <div><h6>Builds on</h6>${pre.length ? pre.map(x => `<span class="chip">${esc(XR.conceptById[x].short)} · ${pct(S.mastery[x])}</span>`).join(" ") : `<span class="hint">Foundation concept</span>`}</div>
+        <div><h6>Traps students fall into</h6>${traps.length ? traps.map(([id, m]) => `<div class="trap">${S.misState?.[id]?.status === "active" ? "🔴" : S.misState?.[id]?.status === "fixed" ? "✅" : "⚠️"} ${esc(m.label)}</div>`).join("") : `<span class="hint">None catalogued</span>`}</div></div></details>`; })()}
       <p class="qtext">${esc(q.text)}</p>
       <div class="opts" id="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span>${esc(o)}</button>`).join("")}</div>
       <div class="field" id="reasonField">
@@ -138,7 +143,9 @@
       XR.traceAdd("schedule_review", `${q.concept} quality`, `next review day ${S.cards[q.concept].due} (SM-2)`);
       if (res.fixedNow) toast(`✅ Misconception fixed: ${XR.MISCONCEPTIONS[res.fixedNow].label}`);
       $("#hintBtn") && $("#hintBtn").remove();
-      $$("#opts .opt").forEach((b, i) => { if (i === q.answer) b.classList.add("right"); else if (i === ui.sel) b.classList.add("wrong"); });
+      $$("#opts .opt").forEach((b, i) => { if (i === q.answer) b.classList.add("right"); else if (i === ui.sel) b.classList.add("wrong");
+        const why = i === q.answer ? "✓ Correct" : q.mis?.[i] ? "Trap: " + XR.MISCONCEPTIONS[q.mis[i]].label.toLowerCase() : "Calculation slip";
+        b.insertAdjacentHTML("beforeend", `<small class="optwhy">${esc(why)}</small>`); });
       $("#result").innerHTML = xrayHTML(q, res, diag, reasoning);
       btn.remove(); $("#qhint").textContent = "";
       onSubmit(res, diag);
