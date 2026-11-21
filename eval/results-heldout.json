@@ -1,0 +1,8 @@
+{
+  "n": 20,
+  "accuracy": 1,
+  "precision": 1,
+  "recall": 1,
+  "reasoning_only_recall": 0.2777777777777778,
+  "misses": []
+}

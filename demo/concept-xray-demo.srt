@@ -1,0 +1,71 @@
+1
+00:00:01,707 --> 00:00:11,481
+Two students give the same wrong answer, for different reasons. Marks show what's wrong. Concept X-Ray shows why.
+
+2
+00:00:11,481 --> 00:00:20,388
+A generic tutor says ‘incorrect’. Concept X-Ray names the misconception, finds its root cause, and alerts the teacher.
+
+3
+00:00:20,388 --> 00:00:29,310
+It runs as a loop: diagnose, read the reasoning, update the learner model, target the next question, then schedule and report.
+
+4
+00:00:29,310 --> 00:00:39,681
+The diagnostic covers both chapters. Each answer collects the option, a line of reasoning, and the student's confidence.
+
+5
+00:00:39,681 --> 00:00:51,693
+Our student picks 0.25 amps and explains: ‘the first bulb uses up some of the current.’ They're certain.
+
+6
+00:00:51,693 --> 00:01:04,911
+The X-Ray reads the reasoning, not just the answer. It names the misconception, quotes the evidence, and gives the fix.
+
+7
+00:01:04,911 --> 00:01:14,681
+The learner model updates after every answer, using Bayesian Knowledge Tracing to separate real understanding from lucky guesses.
+
+8
+00:01:14,681 --> 00:01:24,464
+After ten questions, the X-Ray has found four distinct misconceptions, each one backed by the student's own words.
+
+9
+00:01:24,464 --> 00:01:35,957
+The concept graph shows the whole syllabus. Dashed purple rings mark root causes: weak foundations behind later mistakes.
+
+10
+00:01:35,957 --> 00:01:45,385
+Click any concept to see its mastery trend, prerequisites, active misconceptions, and next review date.
+
+11
+00:01:45,385 --> 00:01:55,155
+Practice targets the weakest concept, or its weaker prerequisite, at a difficulty matched to current mastery.
+
+12
+00:01:55,155 --> 00:02:04,062
+Every decision is shown in the trace, so teachers can check the AI's choices step by step.
+
+13
+00:02:04,062 --> 00:02:12,113
+Students who work on paper can photograph their notebook. Gemini Vision reads the handwriting and diagnoses it.
+
+14
+00:02:12,113 --> 00:02:21,900
+SM-2 spaced repetition builds a review plan. Confident mistakes come back first, and mastered concepts are spaced out.
+
+15
+00:02:21,900 --> 00:02:31,669
+The teacher dashboard shows class-wide gaps: 31 students by 15 concepts, with the class average on the bottom row.
+
+16
+00:02:31,669 --> 00:02:41,872
+Teachers see which wrong ideas are shared across the class, found from reasoning and not just scores.
+
+17
+00:02:41,872 --> 00:02:51,640
+One click assigns a remedial set to exactly the students who share the misconception.
+
+18
+00:02:51,640 --> 00:02:59,400
+Concept X-Ray: fix the reason, not just the answer.

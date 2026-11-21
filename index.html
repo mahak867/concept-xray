@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept X-Ray</title>
+<meta name="description" content="An adaptive Class 10 physics tutor that diagnoses WHY a student is wrong — from their reasoning — and fixes the root cause.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M9 9l14 14M23 9L9 23" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+    <div><b>Concept X-Ray</b><small>Class 10 Physics · Electricity &amp; Light</small></div></div>
+  <nav class="tabs" role="tablist">
+    <button data-view="home" class="active">Overview</button>
+    <button data-view="diagnostic">Diagnostic</button>
+    <button data-view="map">Concept Map</button>
+    <button data-view="practice">Practice</button>
+    <button data-view="review">Review Plan</button>
+    <button data-view="teacher">Teacher</button>
+  </nav>
+  <div class="top-actions">
+    <span id="aiPill" class="pill" title="Which reasoning engine is active">Checking AI…</span>
+    <button id="videoBtn" class="btn ghost">▶ Demo video</button>
+    <button id="tourBtn" class="btn primary">Start Demo</button>
+  </div>
+</header>
+
+<main id="app">
+  <!-- OVERVIEW -->
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Marks tell a student <em>what</em> is wrong. Not <em>why</em>.</p>
+        <h1>Two students both answer “12 Ω”.<br>One added wrong. One believes parallel resistors add up.</h1>
+        <p class="lead">Concept X-Ray reads the student's <b>reasoning</b> — typed or a photo of their notebook — names the exact misconception, traces it back through the syllabus to its root cause, and rebuilds the plan around it.</p>
+        <div class="hero-cta">
+          <button class="btn primary lg" data-go="diagnostic">Take the 10-question diagnostic</button>
+          <button class="btn ghost lg" id="tourBtn2">Watch the guided demo</button>
+        </div>
+      </div>
+      <div class="compare" id="compareCard">
+        <div class="compare-col"><h4>Generic AI tutor</h4>
+          <p class="q">“6 Ω and 6 Ω in parallel?”</p><p class="ans bad">Student: 12 Ω</p>
+          <p class="verdict">✗ Incorrect. The answer is 3 Ω.</p><p class="note">…and the same mistake returns next week.</p></div>
+        <div class="compare-col good"><h4>Concept X-Ray</h4>
+          <p class="q">Reasoning: “in parallel we just add them”</p><p class="ans">Misconception <b>M-PAR-ADD</b> · 93% confidence</p>
+          <p class="verdict">Root cause: Ohm's law at 34% → re-teach first, then 3 targeted parallel questions, review in 1 day.</p><p class="note">Teacher sees: 11 of 31 students share this.</p></div>
+      </div>
+    </div>
+    <div class="pipeline" id="pipeline">
+      <div class="step"><span>1</span><h5>Diagnose</h5><p>10 questions span both chapters. Every answer asks for confidence and one line of reasoning.</p></div>
+      <div class="step"><span>2</span><h5>X-Ray the reasoning</h5><p>Gemini classifies the reasoning into a 12-item misconception list built for this syllabus, quoting the evidence.</p></div>
+      <div class="step"><span>3</span><h5>Update the learner model</h5><p>Bayesian Knowledge Tracing updates the probability that each of 15 concepts is mastered, after every answer.</p></div>
+      <div class="step"><span>4</span><h5>Target &amp; calibrate</h5><p>Next question = weakest concept (or its weaker prerequisite), at a difficulty matched to the student's current mastery.</p></div>
+      <div class="step"><span>5</span><h5>Schedule &amp; report</h5><p>SM-2 spaced repetition schedules reviews; teachers see class-wide gaps and shared misconceptions.</p></div>
+    </div>
+    <div class="stats-row" id="homeStats"></div>
+  </section>
+
+  <!-- DIAGNOSTIC -->
+  <section id="view-diagnostic" class="view">
+    <div class="split">
+      <div class="panel qpanel" id="diagPanel"></div>
+      <aside class="panel side" id="diagSide"></aside>
+    </div>
+  </section>
+
+  <!-- MAP -->
+  <section id="view-map" class="view">
+    <div class="split wide-left">
+      <div class="panel">
+        <div class="panel-head"><h2>Your concept map</h2><p>15 concepts, linked by prerequisite. Node colour = mastery probability from the learner model. Click a node for its history.</p></div>
+        <div class="legend"><span><i class="sw s0"></i>&lt;40% weak</span><span><i class="sw s1"></i>40–70% developing</span><span><i class="sw s2"></i>&gt;70% mastered</span><span><i class="sw root"></i>root-cause gap</span></div>
+        <div id="graphWrap"><svg id="graph" viewBox="0 0 980 450" role="img" aria-label="Concept graph"></svg></div>
+      </div>
+      <aside class="panel side" id="nodeDetail"></aside>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section id="view-practice" class="view">
+    <div class="split">
+      <div class="panel qpanel" id="practicePanel"></div>
+      <aside class="panel side" id="practiceSide"></aside>
+    </div>
+  </section>
+
+  <!-- REVIEW -->
+  <section id="view-review" class="view">
+    <div class="panel">
+      <div class="panel-head row"><div><h2>Spaced-repetition plan</h2><p>Each concept is a card scheduled by SM-2. An answer you were confident about but got wrong resets the card hardest. A correct answer you were sure of pushes the next review furthest out.</p></div>
+        <div class="daybox"><span>Day <b id="dayNum">0</b></span><button class="btn ghost" id="nextDay">Simulate next day →</button></div></div>
+      <div id="reviewTimeline"></div>
+      <div id="reviewTable"></div>
+    </div>
+  </section>
+
+  <!-- TEACHER -->
+  <section id="view-teacher" class="view">
+    <div class="panel-head row"><div><h2>Class 10-B · Physics</h2><p>31 students (30 sample students plus the live learner). Mastery by concept, shared misconceptions, and who needs help today.</p></div>
+      <button class="btn ghost" id="exportBtn">Export CSV</button></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="grid2">
+      <div class="panel"><h3>Class mastery heatmap</h3><p class="sub">Rows = students, columns = concepts. Hover a cell for the value.</p><div id="heatmap"></div></div>
+      <div class="col">
+        <div class="panel" id="topMis"></div>
+        <div class="panel" id="atRisk"></div>
+      </div>
+    </div>
+    <div class="panel" id="insight"></div>
+  </section>
+</main>
+
+<!-- tour overlay -->
+<div id="tourShade" hidden></div>
+<div id="tourRing" hidden></div>
+<div id="tourCard" hidden role="dialog" aria-live="polite">
+  <div class="tc-top"><span id="tcStep"></span><div class="tc-prog"><i id="tcBar"></i></div><button id="tcClose" aria-label="Exit demo">✕</button></div>
+  <p class="tc-feat" id="tcFeat"></p>
+  <h3 id="tcTitle"></h3>
+  <p id="tcBody"></p>
+  <p class="tc-how" id="tcHow"></p>
+  <div class="tc-actions">
+    <button class="btn ghost sm" id="tcPrev">← Back</button>
+    <button class="btn ghost sm" id="tcAuto">⏸ Pause</button>
+    <button class="btn ghost sm" id="tcVideo">▶ Watch demo video</button>
+    <button class="btn primary sm" id="tcNext">Next →</button>
+  </div>
+</div>
+<div id="caption" hidden></div>
+
+<!-- video modal -->
+<div id="videoModal" hidden><div class="vm-box"><div class="vm-head"><b>Concept X-Ray · 3-minute demo</b><button id="vmClose" aria-label="Close">✕</button></div>
+  <video id="demoVideo" controls preload="none" src="demo/concept-xray-demo.mp4"><track kind="captions" src="demo/concept-xray-demo.vtt" srclang="en" label="English" default></video></div></div>
+
+<div id="toast"></div>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+<script src="tour.js"></script>
+</body>
+</html>

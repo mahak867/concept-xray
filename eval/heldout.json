@@ -1,0 +1,22 @@
+[
+ ["d1",0,"after passing through a bulb the current reduces","M_CUR_USED"],
+ ["d1",0,"bulb absorbs some current","M_CUR_USED"],
+ ["d3",0,"resistances always add up","M_PAR_ADD"],
+ ["d3",0,"Req = R1 + R2 = 12","M_PAR_ADD"],
+ ["d2",1,"current = resistance by voltage","M_OHM_INV"],
+ ["d4",0,"stretching makes it easier for electrons to move","M_LEN_INV"],
+ ["d5",0,"kilowatt is the energy unit we pay for","M_KWH_POW"],
+ ["d6",1,"H is proportional to I","M_HEAT_LIN"],
+ ["d6",1,"twice the current so twice the heat","M_HEAT_LIN"],
+ ["d10",0,"same potential difference across each resistor in series","M_SER_V"],
+ ["d9",0,"object distance is +30","M_SIGN"],
+ ["d9",3,"I took all values positive","M_SIGN"],
+ ["d7",0,"denser medium so it moves away from normal","M_REF_AWAY"],
+ ["d7",0,"light goes faster inside glass","M_REF_AWAY"],
+ ["d8",0,"power = 1/f = 1/25 D","M_POW_CM"],
+ ["d8",3,"25 cm focal length gives 25 D","M_POW_CM"],
+ ["p17",0,"the image shrinks when you walk away","M_MIR_SIZE"],
+ ["p20",0,"magnification is v by u","M_MAG_SIGN"],
+ ["d2",3,"I added 6 and 3","null"],
+ ["p13",0,"forgot to multiply properly","null"]
+]
