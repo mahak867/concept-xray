@@ -276,6 +276,13 @@
       <div class="legend">${series.map(s => `<span><i class="sw" style="background:${s.color}"></i>${esc(XR.MISCONCEPTIONS[s.id].label)}${s.approved ? " · remedial approved" : ""}</span>`).join("")}</div>`;
   };
 
+  // ---------------- judge quick-start ----------------
+  document.addEventListener("click", e => {
+    if (e.target.closest("#jPair")) { document.querySelector("#sameCard").scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(() => XR.runPair(), 400); }
+    const l = e.target.closest("[data-jlab]"); if (l) XR.openLab(l.dataset.jlab);
+    if (e.target.closest("#jTour")) XR.startTour();
+  });
+
   // ---------------- WhatsApp report ----------------
   XR.whatsappText = () => {
     const st = S(), base = st.baseline || st.mastery, ids = XR.CONCEPTS.map(c => c.id);

@@ -34,6 +34,16 @@
 <main id="app">
   <!-- OVERVIEW -->
   <section id="view-home" class="view active">
+    <div class="judge">
+      <div class="jl"><span class="eyebrow" style="margin:0">Judging? Start here · 60 seconds</span>
+        <div class="jstats"><div><b>94%</b><span>Gemini recall on unseen English reasoning<br>(keyword rules: 28%)</span></div><div><b>10/10</b><span>Hinglish misconceptions caught<br>(rules: 5/10)</span></div><div><b>1/12</b><span>false alarms on correct answers</span></div></div></div>
+      <div class="jbtns">
+        <button class="btn primary" id="jPair">① Same answer, different reason</button>
+        <button class="btn ghost" data-jlab="M_PAR_ADD">② Break a misconception (experiment)</button>
+        <button class="btn ghost" data-go="lab">③ How the AI is checked</button>
+        <button class="btn ghost" id="jTour">④ Full guided demo (3 min)</button>
+      </div>
+    </div>
     <div class="panel pair" id="sameCard">
       <div class="row"><div><p class="eyebrow" style="margin:0 0 4px">Try it: same answer, different reason</p><h2>Two students both answer 12 Ω for two 6 Ω resistors in parallel.</h2>
       <p class="sub" style="margin:6px 0 0">A marks-only app gives both the same red cross. Run both through the X-Ray and see two different diagnoses and two different plans.</p></div>
