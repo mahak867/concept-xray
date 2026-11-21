@@ -9,6 +9,9 @@ ${misconception ? `It must include one distractor that a student holding this mi
 Use realistic Indian context where natural. Numbers must work out cleanly. Exactly 4 options; verify the answer yourself before replying.`;
   try {
     const out = await gemini([{ text: prompt }], '{"text": string, "options": [4 strings], "answer": 0-3, "trap_option": 0-3|null, "explain": string}');
-    res.status(200).json(out);
+    // Verification pass: an independent call solves the question without seeing the key. Disagreement = discard.
+    const check = await gemini([{ text: `Solve this Class 10 physics MCQ carefully. Question: ${out.text}\nOptions: ${JSON.stringify(out.options)}` }], '{"answer": 0-3, "working": string}');
+    if (check.answer !== out.answer) return res.status(422).json({ error: "verification_failed" });
+    res.status(200).json({ ...out, verified: true });
   } catch (e) { res.status(502).json({ error: String(e.message) }); }
 };

@@ -28,7 +28,7 @@
   document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) go(g.dataset.go); });
 
   function render(v) {
-    ({ home: renderHome, diagnostic: renderDiagnostic, map: renderMap, practice: renderPractice, review: renderReview, teacher: renderTeacher }[v] || (() => {}))();
+    ({ home: renderHome, diagnostic: renderDiagnostic, map: renderMap, practice: renderPractice, review: renderReview, progress: renderProgress, lab: renderLab, teacher: renderTeacher }[v] || (() => {}))();
   }
 
   // ---------------- AI pill ----------------
@@ -70,18 +70,46 @@
       <p class="qtext">${esc(q.text)}</p>
       <div class="opts" id="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span>${esc(o)}</button>`).join("")}</div>
       <div class="field" id="reasonField">
-        <label for="reason">How did you get it? <small>— one line is enough. This is what the X-Ray reads. English or Hinglish is fine.</small></label>
+        <label for="reason">How did you get it? <small>— one line is enough. This is what the X-Ray reads. English or Hinglish is fine.</small> <button type="button" class="btn sm ghost" id="micBtn" title="Speak your reasoning (en-IN)">🎙 Speak</button></label>
         <textarea id="reason" placeholder="e.g. “I used V = IR so I = 6/3…”"></textarea>
         <div class="upload"><label>📷 Add photo of your working<input type="file" accept="image/*" id="photo" hidden></label><span id="photoName">Optional · read by Gemini Vision</span></div>
       </div>
       <div class="field" id="confField"><label>How sure are you?</label>
         <div class="conf" id="conf"><button data-c="1">Guessing</button><button data-c="2" class="sel">Fairly sure</button><button data-c="3">Certain</button></div></div>
-      <div class="qfoot"><span class="hint" id="qhint">Pick an option to continue</span><button class="btn primary" id="submitBtn" disabled>Check &amp; X-Ray my reasoning</button></div>
+      <div class="hints" id="hintBox"></div>
+      <div class="qfoot"><span class="hint" id="qhint">Pick an option to continue</span><button class="btn ghost" id="hintBtn">💡 Hint 1 of 3</button><button class="btn primary" id="submitBtn" disabled>Check &amp; X-Ray my reasoning</button></div>
       <div id="result"></div>`;
   }
 
+  function hintsFor(q) {
+    const c = XR.conceptById[q.concept];
+    const trap = Object.values(q.mis || {})[0];
+    return [
+      ["Nudge", `This tests <strong>${esc(c.name)}</strong>. ${esc(c.desc.split(". ")[0])}.`],
+      ["Watch out", trap ? `A common trap here: ${esc(XR.MISCONCEPTIONS[trap].label.toLowerCase())}. ${esc(XR.MISCONCEPTIONS[trap].fix.split(". ")[0])}.` : `Write the formula first, then substitute values with units.`],
+      ["Method", esc(q.explain)],
+    ];
+  }
   function wireQuestion(q, onSubmit) {
-    ui.sel = null; ui.conf = 2; ui.image = null; ui.answered = false; ui.current = q;
+    ui.sel = null; ui.conf = 2; ui.image = null; ui.answered = false; ui.current = q; ui.hints = 0;
+    const H = hintsFor(q);
+    $("#hintBtn").onclick = () => {
+      if (ui.answered || ui.hints >= 3) return;
+      const [t, body] = H[ui.hints]; ui.hints++;
+      $("#hintBox").insertAdjacentHTML("beforeend", `<div class="hintcard"><b>Hint ${ui.hints} · ${t}</b>${body}</div>`);
+      $("#hintBtn").textContent = ui.hints < 3 ? `💡 Hint ${ui.hints + 1} of 3` : "No more hints";
+      $("#hintBtn").disabled = ui.hints >= 3;
+      $("#qhint").textContent = ui.hints === 3 ? "Method shown: a correct answer now counts as weak evidence" : `Hints used: ${ui.hints}, which slightly lowers the mastery credit`;
+    };
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) $("#micBtn").style.display = "none";
+    else $("#micBtn").onclick = () => {
+      const r = new SR(); r.lang = "en-IN"; r.interimResults = false;
+      $("#micBtn").textContent = "● Listening…";
+      r.onresult = e => { $("#reason").value = ($("#reason").value + " " + e.results[0][0].transcript).trim(); };
+      r.onend = () => { $("#micBtn").textContent = "🎙 Speak"; };
+      r.start();
+    };
     $$("#opts .opt").forEach(b => b.onclick = () => {
       if (ui.answered) return;
       ui.sel = +b.dataset.i; $$("#opts .opt").forEach(x => x.classList.toggle("sel", x === b));
@@ -101,7 +129,9 @@
       const reasoning = $("#reason").value;
       const correct = ui.sel === q.answer;
       const diag = correct ? null : await E.diagnose(q, ui.sel, reasoning, ui.image);
-      const res = E.record(S, q, ui.sel, ui.conf, diag); save();
+      const res = E.record(S, q, ui.sel, ui.conf, diag, ui.hints); save();
+      if (res.fixedNow) toast(`✅ Misconception fixed: ${XR.MISCONCEPTIONS[res.fixedNow].label}`);
+      $("#hintBtn") && $("#hintBtn").remove();
       $$("#opts .opt").forEach((b, i) => { if (i === q.answer) b.classList.add("right"); else if (i === ui.sel) b.classList.add("wrong"); });
       $("#result").innerHTML = xrayHTML(q, res, diag, reasoning);
       btn.remove(); $("#qhint").textContent = "";
@@ -116,7 +146,8 @@
     if (res.correct) {
       return `<div class="xray ok" id="xray"><div class="xh"><b>✓ Correct</b><span>Learner model updated</span></div><div class="xb">
         <div class="xrow"><span>Why</span><div>${esc(q.explain)}</div></div>
-        <div class="xrow"><span>Model</span>${delta}</div></div></div>`;
+        <div class="xrow"><span>Model</span>${delta}</div>
+        ${res.fixedNow ? `<div class="xrow"><span>Closed loop</span><div><b style="color:var(--good)">✅ Fixed: ${esc(XR.MISCONCEPTIONS[res.fixedNow].label)}</b><br><span class="hint">Two correct, hint-free answers in a row on this concept since it was flagged.</span></div></div>` : ""}</div></div>`;
     }
     const rc = E.rootCause(S, q.concept);
     return `<div class="xray" id="xray"><div class="xh"><b>Reasoning X-Ray</b><span class="chip ${diag.source === "gemini" ? "ai" : ""}" style="background:#ffffff22;color:#fff">${diag.source === "gemini" ? "Gemini 2.5 Flash" : "Offline rule engine"}</span></div><div class="xb">
@@ -139,7 +170,7 @@
   function renderDiagnostic() {
     const i = S.diagIndex;
     if (i >= DIAG.length) {
-      S.diagnosticDone = true; save();
+      S.diagnosticDone = true; if (!S.baseline) S.baseline = { ...S.mastery }; save();
       const weak = XR.CONCEPTS.filter(c => S.mastery[c.id] < 0.4).map(c => c.short);
       const mis = Object.keys(S.misconceptions).filter(k => k !== "null");
       $("#diagPanel").innerHTML = `<div class="panel-head"><h2>Diagnostic complete</h2><p>The learner model now has a starting point for all 15 concepts.</p></div>
@@ -263,9 +294,9 @@
       return `<div class="tday ${d === S.day ? "today" : ""}"><h6>${d === S.day ? "Today" : "Day " + d}</h6>${due.map(c => { const p = S.mastery[c.id]; return `<div class="card ${p < .4 ? "weak" : p < .7 ? "mid" : "good"}" title="${esc(c.name)}">${esc(c.short)}</div>`; }).join("")}</div>`;
     }).join("");
     const rows = XR.CONCEPTS.map(c => ({ c, k: S.cards[c.id], p: S.mastery[c.id] })).sort((a, b) => (a.k.due ?? 1e9) - (b.k.due ?? 1e9));
-    $("#reviewTable").innerHTML = `<table><thead><tr><th>Concept</th><th>Mastery</th><th>Status</th><th>Interval</th><th>Ease factor</th><th>Successful reviews</th><th></th></tr></thead><tbody>${rows.map(({ c, k, p }) => {
+    $("#reviewTable").innerHTML = `<table><thead><tr><th>Concept</th><th>Mastery</th><th>Status</th><th>Interval</th><th>Ease factor</th><th>Successful reviews</th><th title="FSRS-style estimate of remembering it today">Recall today</th><th></th></tr></thead><tbody>${rows.map(({ c, k, p }) => {
       const st = k.due == null ? ["new", "Not started"] : k.due <= S.day ? ["due", "Due now"] : k.due - S.day <= 2 ? ["soon", `In ${k.due - S.day}d`] : ["later", `In ${k.due - S.day}d`];
-      return `<tr><td><b>${esc(c.name)}</b></td><td><div class="bar" style="width:110px;display:inline-block;vertical-align:middle"><i style="width:${pct(p)};background:${col(p)}"></i></div> ${pct(p)}</td><td><span class="tag ${st[0]}">${st[1]}</span></td><td>${k.interval ? k.interval + " d" : "—"}</td><td>${k.ef.toFixed(2)}</td><td>${k.reps}</td><td>${k.due != null && k.due <= S.day ? `<button class="btn sm accent" data-rev="${c.id}">Review</button>` : ""}</td></tr>`;
+      return `<tr><td><b>${esc(c.name)}</b></td><td><div class="bar" style="width:110px;display:inline-block;vertical-align:middle"><i style="width:${pct(p)};background:${col(p)}"></i></div> ${pct(p)}</td><td><span class="tag ${st[0]}">${st[1]}</span></td><td>${k.interval ? k.interval + " d" : "—"}</td><td>${k.ef.toFixed(2)}</td><td>${k.reps}</td><td>${(() => { const r = E.recall(k, S.day); return r == null ? "—" : `<b style="color:${col(r)}">${pct(r)}</b>`; })()}</td><td>${k.due != null && k.due <= S.day ? `<button class="btn sm accent" data-rev="${c.id}">Review</button>` : ""}</td></tr>`;
     }).join("")}</tbody></table>`;
     $$("[data-rev]").forEach(b => b.onclick = () => { ui.forceConcept = b.dataset.rev; go("practice"); });
   }
@@ -313,6 +344,78 @@
     const csv = ["Student," + XR.CONCEPTS.map(c => c.name).join(","), ...rows.map(r => r.name + "," + XR.CONCEPTS.map(c => Math.round(r.mastery[c.id] * 100)).join(","))].join("\n");
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "class-10b-mastery.csv"; a.click();
   };
+
+  // ---------------- PROGRESS (proof of learning) ----------------
+  function renderProgress() {
+    const base = S.baseline;
+    if (!base) { $("#progressBody").innerHTML = `<div class="empty">Finish the diagnostic first. Your starting point is saved then, and this page shows how far you've come.</div><div style="text-align:center"><button class="btn primary" data-go="diagnostic">Start diagnostic</button></div>`; return; }
+    const ids = XR.CONCEPTS.map(c => c.id);
+    const avgB = ids.reduce((a, i) => a + base[i], 0) / ids.length, avgN = ids.reduce((a, i) => a + S.mastery[i], 0) / ids.length;
+    const practice = S.attempts.filter(a => !XR.questionById[a.qid]?.diag);
+    const acc = practice.length ? practice.filter(a => a.correct).length / practice.length : 0;
+    const ms = Object.entries(S.misState || {});
+    const fixed = ms.filter(([, m]) => m.status === "fixed"), active = ms.filter(([, m]) => m.status === "active");
+    const masteredB = ids.filter(i => base[i] >= .7).length, masteredN = ids.filter(i => S.mastery[i] >= .7).length;
+    $("#progressBody").innerHTML = `
+      <div class="kpis">
+        <div class="kpi"><b>${avgN >= avgB ? "+" : ""}${Math.round((avgN - avgB) * 100)} pts</b><span>average mastery gain (${pct(avgB)} → ${pct(avgN)})</span></div>
+        <div class="kpi"><b>${masteredB} → ${masteredN}</b><span>concepts mastered (≥70%)</span></div>
+        <div class="kpi"><b>${fixed.length}/${ms.length}</b><span>misconceptions fixed</span></div>
+        <div class="kpi"><b>${practice.length ? pct(acc) : "—"}</b><span>practice accuracy · ${practice.length} answers · ${S.hints || 0} hints</span></div></div>
+      <div class="grid2">
+        <div class="panel"><h3>Before vs now, per concept</h3><p class="sub">Grey = after the diagnostic. Colour = now.</p>
+          <div class="mlist">${XR.CONCEPTS.map(c => `<div class="mrow" style="grid-template-columns:96px 1fr 70px"><span>${esc(c.short)}</span><div class="bar" style="position:relative"><i style="position:absolute;width:${pct(base[c.id])};background:#cfc6b5"></i><i style="position:relative;width:${pct(S.mastery[c.id])};background:${col(S.mastery[c.id])};opacity:.85"></i></div><b>${Math.round(base[c.id] * 100)}→${Math.round(S.mastery[c.id] * 100)}</b></div>`).join("")}</div></div>
+        <div class="col">
+          <div class="panel"><h3>Misconceptions</h3><p class="sub">A misconception closes after two correct, hint-free answers in a row on its concept.</p>
+            ${ms.length ? ms.map(([id, m]) => `<div class="riskrow"><span>${m.status === "fixed" ? "✅" : "🔴"} ${esc(XR.MISCONCEPTIONS[id].label)}<br><small class="hint">Evidence: ${esc(m.evidence || "—")}</small></span><span class="tag ${m.status === "fixed" ? "later" : "due"}">${m.status === "fixed" ? "Fixed" : `Active · ${m.streak}/2`}</span></div>`).join("") : `<p class="hint">None detected yet.</p>`}</div>
+          <div class="panel"><h3>Share with your teacher</h3><p class="sub">A one-page report with these numbers and the evidence for each misconception.</p><button class="btn primary" id="dlReport">Download report</button></div>
+        </div></div>`;
+    $("#dlReport").onclick = () => {
+      const rows = XR.CONCEPTS.map(c => `<tr><td>${c.name}</td><td>${pct(base[c.id])}</td><td>${pct(S.mastery[c.id])}</td></tr>`).join("");
+      const mis = ms.map(([id, m]) => `<li><b>${XR.MISCONCEPTIONS[id].label}</b> — ${m.status}${m.evidence ? ` (evidence: ${esc(m.evidence)})` : ""}</li>`).join("");
+      const html = `<!doctype html><meta charset="utf-8"><title>Concept X-Ray report</title><body style="font-family:sans-serif;max-width:720px;margin:30px auto"><h1>Concept X-Ray · Learning report</h1><p>Day ${S.day} · average mastery ${pct(avgB)} → ${pct(avgN)} · ${fixed.length} of ${ms.length} misconceptions fixed · ${practice.length} practice answers · ${S.hints || 0} hints used</p><h2>Concepts</h2><table border="1" cellpadding="6" style="border-collapse:collapse"><tr><th>Concept</th><th>After diagnostic</th><th>Now</th></tr>${rows}</table><h2>Misconceptions</h2><ul>${mis || "<li>None detected</li>"}</ul><p style="color:#888">Mastery = Bayesian Knowledge Tracing estimate. Generated by Concept X-Ray.</p></body>`;
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type: "text/html" })); a.download = "concept-xray-report.html"; a.click();
+    };
+  }
+
+  // ---------------- AI LAB (how the AI is checked) ----------------
+  const OFFLINE = { dev: { n: 40, full: 1, text: 0.86 }, held: { n: 20, full: 1, text: 0.28 } };
+  function renderLab() {
+    $("#labBody").innerHTML = `
+      <div class="grid2">
+        <div class="panel"><h3>Offline rule engine (always available)</h3><p class="sub">Scored on hand-labelled student reasoning. “Text only” hides the chosen option, so only the written reasoning counts.</p>
+          <table><thead><tr><th>Set</th><th>n</th><th>Full engine</th><th>Text only</th></tr></thead><tbody>
+          <tr><td>Development (rules written on it)</td><td>${OFFLINE.dev.n}</td><td>${pct(OFFLINE.dev.full)}</td><td>${pct(OFFLINE.dev.text)}</td></tr>
+          <tr><td><b>Held-out (never tuned on)</b></td><td>${OFFLINE.held.n}</td><td>${pct(OFFLINE.held.full)}</td><td><b style="color:var(--weak)">${pct(OFFLINE.held.text)}</b></td></tr></tbody></table>
+          <p class="hint" style="margin-top:10px">Keyword rules don't generalise to new wording. That's why the live product sends reasoning to Gemini, and keeps the rules only as an offline fallback.</p></div>
+        <div class="panel"><h3>Gemini on the same held-out set</h3><p class="sub">Runs all 20 held-out responses through the live <code>/api/analyze</code> endpoint, text only, and scores them here in your browser.</p>
+          <button class="btn primary" id="runLab" ${E.AI.live ? "" : "disabled"}>${E.AI.live ? "Run the held-out check on Gemini" : "Gemini is offline on this copy"}</button>
+          <div id="labOut" style="margin-top:12px"></div></div></div>
+      <div class="panel"><h3>Guardrails we check</h3><ul style="margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.8">
+        <li>Every AI diagnosis must quote the student's own words as evidence, and shows a confidence score.</li>
+        <li>Every AI-generated question is solved a second time by an independent Gemini call. It's discarded if the answers disagree.</li>
+        <li>Hints come before the answer, and using them lowers the mastery credit, so the tutor never just hands over answers.</li>
+        <li>If Gemini fails or times out, the offline engine answers instead, so a student is never left waiting.</li></ul></div>`;
+    const b = $("#runLab"); if (!b) return;
+    b.onclick = async () => {
+      b.disabled = true; const rows = await (await fetch("eval/heldout.json")).json();
+      let hit = 0, n = 0, out = [];
+      for (const [qid, ch, text, gold] of rows) {
+        if (gold === "null") continue;
+        const q = XR.questionById[qid]; n++;
+        b.innerHTML = `<span class="spinner"></span>Checking ${n}…`;
+        let pred = "error";
+        try {
+          const r = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.text, options: q.options, chosen: "(hidden)", correct: q.options[q.answer], reasoning: text, taxonomy: Object.entries(XR.MISCONCEPTIONS).map(([id, m]) => ({ id, label: m.label })) }) });
+          pred = (await r.json()).misconception_id || "null";
+        } catch {}
+        if (pred === gold) hit++;
+        out.push(`<tr><td>“${esc(text)}”</td><td>${pred === gold ? "✅" : "❌"} ${esc(pred)}</td></tr>`);
+        $("#labOut").innerHTML = `<p><b style="font-size:22px">${hit}/${n}</b> recalled from text alone (offline rules: ${pct(OFFLINE.held.text)})</p><table><tbody>${out.join("")}</tbody></table>`;
+      }
+      b.textContent = "Run again"; b.disabled = false;
+    };
+  }
 
   // ---------------- video modal ----------------
   function openVideo() { const m = $("#videoModal"); m.hidden = false; const v = $("#demoVideo"); v.currentTime = 0; v.play().catch(() => {}); }

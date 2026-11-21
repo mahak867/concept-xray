@@ -1,0 +1,11 @@
+const { chromium } = require("playwright");
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+ const errs = []; p.on("pageerror", e => errs.push(e.message));
+ await p.goto("http://localhost:3000/#diagnostic"); await p.click('#opts .opt[data-i="0"]'); await p.click("#hintBtn"); await p.click("#hintBtn");
+ await p.fill("#reason", "the bulb uses up current"); await p.click("#submitBtn"); await p.waitForTimeout(800);
+ await p.screenshot({ path: "/tmp/claude-0/shots/n1.png" });
+ await p.evaluate(() => { const S = XR.getState(); S.baseline = { ...S.mastery }; S.mastery.current = 0.8; }); 
+ await p.click('[data-view="progress"]'); await p.waitForTimeout(400); await p.screenshot({ path: "/tmp/claude-0/shots/n2.png" });
+ await p.click('[data-view="lab"]'); await p.waitForTimeout(400); await p.screenshot({ path: "/tmp/claude-0/shots/n3.png" });
+ await p.click('[data-view="review"]'); await p.waitForTimeout(400);
+ console.log("errors", JSON.stringify(errs)); await b.close(); })();

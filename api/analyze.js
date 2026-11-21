@@ -1,6 +1,9 @@
 const { gemini } = require("./_gemini");
 module.exports = async (req, res) => {
-  if (req.method !== "POST") return res.status(405).end();
+  if (req.method === "GET") {
+    // self-test: one fixed held-out example, so the live AI can be checked from a browser
+    req.body = { question: "Two identical bulbs are in series. The ammeter before bulb 1 reads 0.5 A. What does an ammeter between the bulbs read?", options: ["0.25 A", "0.5 A", "1.0 A", "0 A"], chosen: "(hidden)", correct: "0.5 A", reasoning: "after passing through a bulb the current reduces", taxonomy: [{ id: "M_CUR_USED", label: "Believes current is used up along a circuit" }, { id: "M_OHM_INV", label: "Inverts Ohm's law" }, { id: "M_SER_V", label: "Thinks voltage is the same across series resistors" }] };
+  } else if (req.method !== "POST") return res.status(405).end();
   const { question, options, chosen, correct, reasoning, image, taxonomy } = req.body || {};
   const prompt = `A student answered a physics question incorrectly. Diagnose the MISCONCEPTION from their REASONING (and handwritten working if an image is attached), not just the final answer.
 Question: ${question}

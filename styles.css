@@ -200,3 +200,14 @@ td{padding:10px 8px;border-bottom:1px solid #f0ebe0}
   main{padding:20px 16px 80px}
 }
 @media (max-width:600px){.opts,.compare{grid-template-columns:1fr}#tourCard{width:calc(100% - 24px)}.top-actions .pill{display:none}}
+
+.hints{display:grid;gap:8px;margin-top:14px}
+.hintcard{background:#fff8e8;border:1px solid #f0dcb0;border-radius:10px;padding:10px 12px;font-size:14px;animation:fade .3s}
+.hintcard > b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin-bottom:2px}
+#micBtn{margin-left:6px;padding:2px 8px;font-size:12px}
+.qfoot{flex-wrap:wrap}
+.tabs{flex-wrap:nowrap;overflow-x:auto}
+.tabs button{white-space:nowrap;padding:7px 11px}
+.top-actions .btn{white-space:nowrap}
+.topbar{gap:14px}
+@media (max-width:1500px){.brand small{display:none}.tabs button{padding:7px 9px;font-size:13.5px}}

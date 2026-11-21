@@ -19,7 +19,9 @@
     <button data-view="map">Concept Map</button>
     <button data-view="practice">Practice</button>
     <button data-view="review">Review Plan</button>
+    <button data-view="progress">Progress</button>
     <button data-view="teacher">Teacher</button>
+    <button data-view="lab">AI Lab</button>
   </nav>
   <div class="top-actions">
     <span id="aiPill" class="pill" title="Which reasoning engine is active">Checking AI…</span>
@@ -96,6 +98,18 @@
       <div id="reviewTimeline"></div>
       <div id="reviewTable"></div>
     </div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section id="view-progress" class="view">
+    <div class="panel-head"><h2>Proof of learning</h2><p>Where the student started after the diagnostic, where they are now, and which misconceptions have been fixed, with the evidence for each.</p></div>
+    <div id="progressBody"></div>
+  </section>
+
+  <!-- AI LAB -->
+  <section id="view-lab" class="view">
+    <div class="panel-head"><h2>How the AI is checked</h2><p>We don't ask you to trust the AI. Here is how often it is right on student reasoning it has never seen, and the guardrails around it.</p></div>
+    <div id="labBody"></div>
   </section>
 
   <!-- TEACHER -->
