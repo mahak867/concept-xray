@@ -6,6 +6,21 @@
 
 An adaptive exam-prep tutor for CBSE Class 10 Physics (Electricity + Light).
 
+![Home: same answer, different reason](docs/home.png)
+
+| Reasoning X-Ray | Break the misconception |
+|---|---|
+| ![X-Ray](docs/xray.png) | ![Experiment](docs/experiment.png) |
+| **Agent tool calls** | **Teacher approves the agent's draft** |
+| ![Agent trace](docs/agent-trace.png) | ![Teacher approval](docs/teacher-approval.png) |
+
+## Why it's an agent, not a chatbot
+- **It acts on a model of the student, not on the last message.** It keeps BKT mastery for 15 concepts, misconception states, and SM-2 schedules.
+- **It plans.** It traces a weak concept to its root-cause prerequisite, then picks the concept, difficulty and question.
+- **It checks itself.** Each diagnosis quotes evidence; generated questions are re-solved by an independent call; accuracy is measured on held-out data.
+- **A human approves anything that affects a class.** The teacher approves, edits or rejects every remedial draft, and decisions are logged.
+- **It works without the AI.** Every AI call has a deterministic offline fallback, and `?demo=1` forces it.
+
 ## Why it's different
 
 | | Marks-only apps | Generic AI tutor | **Concept X-Ray** |
@@ -86,6 +101,13 @@ Browser (vanilla JS, no build)               Serverless (/api, Vercel)
 The v2 set (`eval/heldout2.json`) can be run live through Gemini from the AI Lab page, which reports English recall, Hinglish recall and the false-alarm rate. Gemini's v2 numbers above come from a live AI Lab run on the deployed site. `?demo=1` forces the offline engine for a guaranteed-stable demo, and the badge says "Demo mode (offline)".
 
 The full engine scores 100% partly because each wrong option is pre-mapped to a misconception. On reasoning text alone, keyword rules don't generalise to new wording (28%). **That is why the live product uses Gemini** for reasoning, and why the rule engine is only an offline fallback. Gemini recalls **78%** of held-out misconceptions from text alone, nearly 3× the rules. Its 4 misses: three phrasings where it returned no misconception, and one it labelled as a sign-convention error instead of a mirror/lens mix-up. We did not tune the prompt on this set. The same held-out set can be re-run through live Gemini from the app's **AI Lab** page. In a spot check on the deployed site, Gemini correctly diagnosed "after passing through a bulb the current reduces" as *current is used up*, with 95% confidence and quoted evidence. That phrasing is one the rules miss.
+
+## Tests
+Run the engine tests (23 checks on BKT, SM-2, recall, the misconception engine, the lifecycle, hint credit and data integrity):
+
+```bash
+npm test
+```
 
 ## Run it
 

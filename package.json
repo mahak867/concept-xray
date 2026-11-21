@@ -1,1 +1,10 @@
-{ "name": "concept-xray", "version": "1.0.0", "private": true, "scripts": { "dev": "node server.js", "eval": "node eval/run-eval.js" } }
+{
+ "name": "concept-xray",
+ "version": "1.0.0",
+ "private": true,
+ "scripts": {
+  "dev": "node server.js",
+  "eval": "node eval/run-eval.js",
+  "test": "node tests/engine.test.js"
+ }
+}
