@@ -1,69 +1,77 @@
 WEBVTT
 
 1
-00:00:03.590 --> 00:00:17.940
+00:00:03.042 --> 00:00:15.517
 Same wrong answer, different reasons. Student A believes parallel resistors add; Student B made an arithmetic slip. Different plans.
 
 2
-00:00:17.940 --> 00:00:27.357
+00:00:15.517 --> 00:00:23.715
 The diagnostic covers both chapters. Each answer collects the option, a line of reasoning, and the student's confidence.
 
 3
-00:00:27.357 --> 00:00:38.087
+00:00:23.715 --> 00:00:33.047
 Our student picks 0.25 amps and explains: ‘the first bulb uses up some of the current.’ They're certain.
 
 4
-00:00:38.087 --> 00:00:55.841
+00:00:33.047 --> 00:00:48.468
 The X-Ray reads the reasoning, not just the answer. It names the misconception, quotes the evidence, and gives the fix.
 
 5
-00:00:55.841 --> 00:01:12.278
+00:00:48.468 --> 00:01:02.761
 Break the misconception: predict, run the experiment, see the prediction fail, explain. The tutor re-checks the explanation and closes the misconception.
 
 6
-00:01:12.278 --> 00:01:21.343
+00:01:02.761 --> 00:01:10.643
 Teach it another way: the same Class 10 lesson as an analogy, an Indian real-life example, or step by step, in English, Hinglish or Hindi.
 
 7
-00:01:21.343 --> 00:01:29.886
+00:01:10.643 --> 00:01:18.086
 After ten questions, the X-Ray has found four distinct misconceptions, each one backed by the student's own words.
 
 8
-00:01:29.886 --> 00:01:40.453
+00:01:18.086 --> 00:01:29.578
 The concept graph shows the whole syllabus. Dashed purple rings mark root causes: weak foundations behind later mistakes.
 
 9
-00:01:40.453 --> 00:01:48.991
-Practice targets the weakest concept, or its weaker prerequisite, at a difficulty matched to current mastery.
+00:01:29.578 --> 00:01:37.167
+Explain it back: the student teaches the concept in their own words, and the tutor checks it for wrong ideas and missing key points.
 
 10
-00:01:48.991 --> 00:01:57.885
-The agent shows its work as tool calls: diagnose, update the learner model, find the root cause, pick and verify the next question, schedule review.
+00:01:37.167 --> 00:01:44.591
+Practice targets the weakest concept, or its weaker prerequisite, at a difficulty matched to current mastery.
 
 11
-00:01:57.885 --> 00:02:06.514
-A three-level hint ladder: nudge, trap warning, then method. Each hint lowers the mastery credit, so answers are earned.
+00:01:44.591 --> 00:01:52.324
+The agent shows its work as tool calls: diagnose, update the learner model, find the root cause, pick and verify the next question, schedule review.
 
 12
-00:02:06.514 --> 00:02:15.058
-SM-2 spaced repetition builds a review plan. Confident mistakes come back first, and mastered concepts are spaced out.
+00:01:52.324 --> 00:01:59.828
+A three-level hint ladder: nudge, trap warning, then method. Each hint lowers the mastery credit, so answers are earned.
 
 13
-00:02:15.058 --> 00:02:25.024
-Proof of learning: two clean answers close a misconception as Fixed. The teacher gets a before-and-after report.
+00:01:59.828 --> 00:02:07.257
+SM-2 spaced repetition builds a review plan. Confident mistakes come back first, and mastered concepts are spaced out.
 
 14
-00:02:25.024 --> 00:02:35.419
-The teacher dashboard shows class-wide gaps: 31 students by 15 concepts, with the class average on the bottom row.
+00:02:07.257 --> 00:02:18.890
+Proof of learning: two clean answers close a misconception as Fixed. The teacher gets a before-and-after report.
 
 15
-00:02:35.419 --> 00:02:43.964
-The agent drafts the remedial lesson; the teacher approves, edits or rejects it before anything is assigned.
+00:02:18.890 --> 00:02:27.534
+The class agent scans 31 learner models, finds shared misconceptions, at-risk students and root gaps, and drafts a briefing for the teacher to approve.
 
 16
-00:02:43.964 --> 00:02:53.914
-On unseen wording, rules catch 28% of misconceptions and Gemini catches 78%. This recording runs offline; Gemini is live at concept-xray.vercel.app.
+00:02:27.534 --> 00:02:34.739
+The teacher dashboard shows class-wide gaps: 31 students by 15 concepts, with the class average on the bottom row.
 
 17
-00:02:53.914 --> 00:03:00.669
+00:02:34.739 --> 00:02:42.170
+The agent drafts the remedial lesson; the teacher approves, edits or rejects it before anything is assigned.
+
+18
+00:02:42.170 --> 00:02:50.821
+On unseen wording, rules catch 28% of misconceptions; Gemini catches 94%, and 100% in Hinglish. This recording runs offline; Gemini is live at concept-xray.vercel.app.
+
+19
+00:02:50.821 --> 00:02:56.695
 Concept X-Ray: fix the reason, not just the answer.
